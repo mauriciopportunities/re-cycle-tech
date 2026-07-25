@@ -1,3 +1,7 @@
+/* ============================================================
+   ESTILOS PRINCIPALES DE LA APLICACIÓN
+   ============================================================ */
+
 .App {
   text-align: center;
   padding: 20px;
@@ -23,4 +27,227 @@ li {
   border-radius: 8px;
   border-left: 4px solid #28a745;
   text-align: left;
+}
+
+/* ============================================================
+   ESTILOS DE NAVEGACIÓN
+   ============================================================ */
+
+.app-header {
+  background: linear-gradient(135deg, #1a3b4f 0%, #0f2b3d 100%);
+  padding: 12px 24px;
+  border-radius: 12px;
+  margin-bottom: 20px;
+  border-bottom: 3px solid #2ecc71;
+}
+
+.nav-principal {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  max-width: 1200px;
+  margin: 0 auto;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.nav-logo {
+  font-size: 22px;
+  font-weight: 700;
+  color: #2ecc71;
+  text-decoration: none;
+}
+
+.nav-links {
+  display: flex;
+  gap: 20px;
+}
+
+.nav-link {
+  color: #e8f4f8;
+  text-decoration: none;
+  font-weight: 600;
+  padding: 6px 14px;
+  border-radius: 8px;
+  transition: background 0.3s, color 0.3s;
+}
+
+.nav-link:hover {
+  background: rgba(46, 204, 113, 0.2);
+  color: #2ecc71;
+}
+
+/* ============================================================
+   ESTILOS PARA INFOWINDOW DE GOOGLE MAPS
+   ============================================================ */
+
+/* InfoWindow para el usuario (marcador azul) */
+.info-window-usuario {
+  padding: 8px 4px;
+  font-family: Arial, sans-serif;
+  min-width: 200px;
+}
+
+.info-window-usuario h3 {
+  color: #2980b9;
+  margin-bottom: 6px;
+  font-size: 16px;
+  border-bottom: 2px solid #2980b9;
+  padding-bottom: 4px;
+}
+
+.info-window-usuario p {
+  margin: 4px 0;
+  font-size: 13px;
+  color: #2c3e50;
+}
+
+.ubicacion-referencia {
+  font-weight: 600;
+  color: #1a5276 !important;
+  margin-top: 6px !important;
+  padding-top: 6px;
+  border-top: 1px dashed #d5dbdb;
+}
+
+.ubicacion-pais {
+  color: #7f8c8d !important;
+  font-size: 12px !important;
+}
+
+/* InfoWindow para los centros de acopio (marcadores rojos) */
+.info-window-centro {
+  padding: 8px 4px;
+  font-family: Arial, sans-serif;
+  min-width: 220px;
+  max-width: 280px;
+}
+
+.info-window-centro h3 {
+  color: #c0392b;
+  margin-bottom: 6px;
+  font-size: 16px;
+  border-bottom: 2px solid #c0392b;
+  padding-bottom: 4px;
+}
+
+.info-window-centro p {
+  margin: 4px 0;
+  font-size: 13px;
+  color: #2c3e50;
+  line-height: 1.4;
+}
+
+.info-window-centro p strong {
+  color: #1a5276;
+}
+
+/* Información de ubicación en la página */
+.info-ubicacion {
+  font-size: 14px;
+  color: #2980b9;
+  background: #eaf2f8;
+  padding: 8px 16px;
+  border-radius: 8px;
+  display: inline-block;
+  margin-bottom: 10px;
+  border: 1px solid #b0d4e3;
+}
+
+.info-radio {
+  font-size: 13px;
+  color: #5d6d7e;
+  margin-bottom: 12px;
+}
+
+/* Contenedor del mapa */
+.mapa-container {
+  max-width: 100%;
+  padding: 10px 0;
+}
+
+/* Mensaje de carga y error */
+.cargando {
+  padding: 40px;
+  font-size: 18px;
+  color: #3498db;
+}
+
+.error {
+  padding: 40px;
+  font-size: 18px;
+  color: #e74c3c;
+  background: #fadbd8;
+  border-radius: 8px;
+}
+
+/* Lista de centros debajo del mapa */
+.lista-centros {
+  list-style: none;
+  padding: 0;
+  margin: 20px auto;
+  max-width: 600px;
+}
+
+.lista-centros li {
+  background: #f8f9fa;
+  padding: 12px 16px;
+  margin: 8px 0;
+  border-radius: 8px;
+  border-left: 4px solid #28a745;
+  text-align: left;
+  transition: all 0.3s ease;
+}
+
+.lista-centros li:hover {
+  background: #eafaf1;
+  transform: translateX(4px);
+  box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+}
+
+.lista-centros li strong {
+  color: #1a5276;
+  font-size: 15px;
+}
+
+.lista-centros li small {
+  color: #5d6d7e;
+  font-size: 13px;
+}
+
+/* ============================================================
+   ESTILOS RESPONSIVE
+   ============================================================ */
+
+@media (max-width: 768px) {
+  .info-window-usuario,
+  .info-window-centro {
+    min-width: 160px;
+  }
+  
+  .info-window-usuario h3,
+  .info-window-centro h3 {
+    font-size: 14px;
+  }
+  
+  .info-window-usuario p,
+  .info-window-centro p {
+    font-size: 12px;
+  }
+  
+  .info-ubicacion {
+    font-size: 12px;
+    padding: 6px 12px;
+  }
+}
+
+@media (max-width: 600px) {
+  .nav-principal {
+    flex-direction: column;
+    align-items: center;
+  }
+  
+  .nav-links {
+    gap: 12px;
+  }
 } 

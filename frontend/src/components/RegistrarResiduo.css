@@ -1,0 +1,279 @@
+/* ============================================================
+   ESTILOS DEL FORMULARIO DE REGISTRO DE RESIDUOS
+   ============================================================ */
+
+.registro-container {
+  max-width: 600px;
+  margin: 0 auto;
+  padding: 24px;
+  background: #ffffff;
+  border-radius: 16px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+  border: 1px solid #e8ecf0;
+}
+
+.registro-container h2 {
+  color: #2c3e50;
+  text-align: center;
+  margin-bottom: 4px;
+  font-size: 28px;
+}
+
+.subtitulo {
+  text-align: center;
+  color: #7f8c8d;
+  margin-bottom: 24px;
+  font-size: 14px;
+}
+
+.campo {
+  margin-bottom: 18px;
+}
+
+.campo label {
+  display: block;
+  font-weight: 600;
+  margin-bottom: 6px;
+  color: #2c3e50;
+  font-size: 14px;
+}
+
+.select-tipo,
+.select-estado,
+.textarea-descripcion {
+  width: 100%;
+  padding: 10px 14px;
+  border: 2px solid #dce1e6;
+  border-radius: 10px;
+  font-size: 14px;
+  font-family: Arial, sans-serif;
+  transition: border-color 0.3s, box-shadow 0.3s;
+  background: #fafbfc;
+}
+
+.select-tipo:focus,
+.select-estado:focus,
+.textarea-descripcion:focus {
+  border-color: #27ae60;
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(39, 174, 96, 0.15);
+  background: #ffffff;
+}
+
+.textarea-descripcion {
+  resize: vertical;
+  min-height: 80px;
+}
+
+.campo-ubicacion {
+  margin-bottom: 18px;
+  padding: 16px;
+  background: #f0f8f4;
+  border-radius: 12px;
+  border: 2px solid #d5e8db;
+}
+
+.campo-ubicacion label {
+  display: block;
+  font-weight: 600;
+  margin-bottom: 10px;
+  color: #1a5276;
+  font-size: 14px;
+}
+
+.ubicacion-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-bottom: 12px;
+}
+
+.btn-ubicacion {
+  background: #3498db;
+  color: white;
+  border: none;
+  padding: 8px 18px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: 600;
+  font-size: 13px;
+  transition: background 0.3s;
+  flex: 1;
+  min-width: 120px;
+}
+
+.btn-ubicacion:hover {
+  background: #2980b9;
+}
+
+.btn-ubicacion-default {
+  background: #8e44ad;
+  color: white;
+  border: none;
+  padding: 8px 18px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: 600;
+  font-size: 13px;
+  transition: background 0.3s;
+  flex: 1;
+  min-width: 120px;
+}
+
+.btn-ubicacion-default:hover {
+  background: #7d3c98;
+}
+
+.coordenadas {
+  display: flex;
+  gap: 12px;
+  margin-top: 8px;
+}
+
+.input-coordenada {
+  flex: 1;
+  padding: 10px 14px;
+  border: 2px solid #dce1e6;
+  border-radius: 8px;
+  font-size: 14px;
+  transition: border-color 0.3s;
+  background: #ffffff;
+}
+
+.input-coordenada:focus {
+  border-color: #27ae60;
+  outline: none;
+}
+
+.ubicacion-confirmada {
+  display: block;
+  margin-top: 8px;
+  font-size: 13px;
+  color: #27ae60;
+  font-weight: 600;
+}
+
+.acciones-formulario {
+  display: flex;
+  gap: 12px;
+  margin-top: 20px;
+}
+
+.btn-registrar {
+  flex: 2;
+  padding: 12px;
+  background: #27ae60;
+  color: white;
+  border: none;
+  border-radius: 10px;
+  font-size: 16px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background 0.3s, transform 0.2s;
+}
+
+.btn-registrar:hover:not(:disabled) {
+  background: #219a52;
+  transform: translateY(-1px);
+}
+
+.btn-registrar:disabled {
+  background: #95a5a6;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.btn-limpiar {
+  flex: 1;
+  padding: 12px;
+  background: #e74c3c;
+  color: white;
+  border: none;
+  border-radius: 10px;
+  font-size: 16px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background 0.3s;
+}
+
+.btn-limpiar:hover {
+  background: #c0392b;
+}
+
+.mensaje-exito {
+  padding: 12px 16px;
+  background: #d5f5e3;
+  color: #1a7a42;
+  border-radius: 10px;
+  margin-bottom: 16px;
+  border-left: 4px solid #27ae60;
+  font-size: 14px;
+  line-height: 1.6;
+}
+
+.mensaje-error {
+  padding: 12px 16px;
+  background: #fadbd8;
+  color: #922b21;
+  border-radius: 10px;
+  margin-bottom: 16px;
+  border-left: 4px solid #e74c3c;
+  font-size: 14px;
+}
+
+.link-login {
+  color: #2980b9;
+  font-weight: 600;
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+.mensaje-ambiental {
+  margin-top: 24px;
+  padding: 16px 20px;
+  background: linear-gradient(135deg, #eafaf1 0%, #d5f5e3 100%);
+  border-radius: 12px;
+  border-left: 4px solid #27ae60;
+  font-size: 14px;
+  color: #1a5276;
+  line-height: 1.6;
+}
+
+.mensaje-ambiental p {
+  margin: 6px 0;
+}
+
+.datos-impacto {
+  font-size: 13px;
+  color: #2c3e50;
+  background: rgba(255, 255, 255, 0.6);
+  padding: 8px 12px;
+  border-radius: 8px;
+  margin-top: 8px !important;
+}
+
+/* Responsive */
+@media (max-width: 600px) {
+  .registro-container {
+    padding: 16px;
+    margin: 0 10px;
+  }
+  
+  .coordenadas {
+    flex-direction: column;
+    gap: 8px;
+  }
+  
+  .acciones-formulario {
+    flex-direction: column;
+  }
+  
+  .btn-registrar,
+  .btn-limpiar {
+    width: 100%;
+  }
+  
+  .ubicacion-actions {
+    flex-direction: column;
+  }
+} 

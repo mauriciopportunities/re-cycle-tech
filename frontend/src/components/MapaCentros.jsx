@@ -7,19 +7,21 @@ const containerStyle = {
   height: '500px'
 };
 
-const center = {
-  lat: 13.68935,
-  lng: -89.18718
+// Coordenadas de Urbanización Las Orquideas (ubicación por defecto)
+const UBICACION_DEFAULT = {
+  lat: 13.791660737396686,
+  lng: -89.17922954299647
 };
 
 const MapaCentros = () => {
-  const [ubicacion, setUbicacion] = useState(center);
+  const [ubicacion, setUbicacion] = useState(UBICACION_DEFAULT);
   const [centros, setCentros] = useState([]);
   const [cargando, setCargando] = useState(true);
   const [error, setError] = useState(null);
-  const [selected, setSelected] = useState(null); // ← Nuevo estado para InfoWindow
+  const [selected, setSelected] = useState(null);
+  const [mostrarInfoUsuario, setMostrarInfoUsuario] = useState(false);
 
-  // Obtener ubicación del usuario
+  // Obtener ubicación del usuario (si permite geolocalización)
   useEffect(() => {
     if (navigator.geolocation) {
       navigator.geolocation.getCurrentPosition(
@@ -30,7 +32,8 @@ const MapaCentros = () => {
           });
         },
         () => {
-          console.log('Usando ubicación por defecto');
+          console.log('Usando ubicación por defecto: Urbanización Las Orquideas');
+          // Mantener la ubicación por defecto
         }
       );
     }
@@ -57,27 +60,49 @@ const MapaCentros = () => {
     fetchCentros();
   }, [ubicacion]);
 
-  if (cargando) return <div>Cargando centros cercanos...</div>;
-  if (error) return <div>{error}</div>;
+  if (cargando) return <div className="cargando">Cargando centros cercanos...</div>;
+  if (error) return <div className="error">{error}</div>;
 
   return (
     <LoadScript googleMapsApiKey={import.meta.env.VITE_GOOGLE_MAPS_API_KEY}>
-      <div>
-        <h2>Centros de Acopio Cercanos</h2>
+      <div className="mapa-container">
+        <h2>📍 Centros de Acopio Cercanos</h2>
+        <p className="info-ubicacion">
+          📌 Tu ubicación: {ubicacion.lat.toFixed(6)}, {ubicacion.lng.toFixed(6)}
+        </p>
+        <p className="info-radio">Mostrando los {centros.length} centros más cercanos a tu ubicación</p>
+
         <GoogleMap
           mapContainerStyle={containerStyle}
           center={ubicacion}
-          zoom={12}
+          zoom={14}
         >
-          {/* Marcador de ubicación del usuario */}
+          {/* Marcador de ubicación del usuario (azul) con InfoWindow */}
           <Marker
             position={ubicacion}
             icon={{
               url: 'http://maps.google.com/mapfiles/ms/icons/blue-dot.png'
             }}
+            onClick={() => setMostrarInfoUsuario(!mostrarInfoUsuario)}
           />
 
-          {/* Marcadores de centros de acopio */}
+          {/* InfoWindow para el marcador azul */}
+          {mostrarInfoUsuario && (
+            <InfoWindow
+              position={ubicacion}
+              onCloseClick={() => setMostrarInfoUsuario(false)}
+            >
+              <div className="info-window-usuario">
+                <h3>📍 Tu ubicación</h3>
+                <p><strong>Latitud:</strong> {ubicacion.lat.toFixed(8)}</p>
+                <p><strong>Longitud:</strong> {ubicacion.lng.toFixed(8)}</p>
+                <p className="ubicacion-referencia">🏠 Urbanización Las Orquideas</p>
+                <p className="ubicacion-pais">🇸🇻 El Salvador</p>
+              </div>
+            </InfoWindow>
+          )}
+
+          {/* Marcadores de centros de acopio (rojos) */}
           {centros.map((centro) => (
             <Marker
               key={centro.id}
@@ -90,23 +115,25 @@ const MapaCentros = () => {
             />
           ))}
 
-          {/* InfoWindow al hacer clic en un marcador */}
+          {/* InfoWindow para los centros de acopio */}
           {selected && (
             <InfoWindow
               position={{ lat: selected.latitud, lng: selected.longitud }}
               onCloseClick={() => setSelected(null)}
             >
-              <div>
+              <div className="info-window-centro">
                 <h3>{selected.nombre}</h3>
                 <p>{selected.direccion}</p>
-                <p><strong>{selected.distanciaKm.toFixed(2)} km</strong></p>
+                <p><strong>📏 {selected.distanciaKm.toFixed(2)} km</strong></p>
+                <p>📞 {selected.telefono}</p>
+                <p>🕐 {selected.horario}</p>
+                <p>📦 Capacidad: {selected.capacidad}</p>
               </div>
             </InfoWindow>
           )}
         </GoogleMap>
 
-        {/* Lista de centros */}
-        <ul>
+        <ul className="lista-centros">
           {centros.map((centro) => (
             <li key={centro.id}>
               <strong>{centro.nombre}</strong> - {centro.distanciaKm.toFixed(2)} km

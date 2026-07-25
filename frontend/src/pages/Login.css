@@ -1,0 +1,117 @@
+.login-container {
+  max-width: 400px;
+  margin: 40px auto;
+  padding: 32px;
+  background: #ffffff;
+  border-radius: 16px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+  border: 1px solid #e8ecf0;
+}
+
+.login-container h2 {
+  color: #2c3e50;
+  text-align: center;
+  margin-bottom: 4px;
+  font-size: 28px;
+}
+
+.login-container .subtitulo {
+  text-align: center;
+  color: #7f8c8d;
+  margin-bottom: 24px;
+  font-size: 14px;
+}
+
+.login-form .campo {
+  margin-bottom: 18px;
+}
+
+.login-form label {
+  display: block;
+  font-weight: 600;
+  margin-bottom: 6px;
+  color: #2c3e50;
+  font-size: 14px;
+}
+
+.login-form input {
+  width: 100%;
+  padding: 10px 14px;
+  border: 2px solid #dce1e6;
+  border-radius: 10px;
+  font-size: 14px;
+  transition: border-color 0.3s;
+  box-sizing: border-box;
+}
+
+.login-form input:focus {
+  border-color: #27ae60;
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(39, 174, 96, 0.15);
+}
+
+.btn-login {
+  width: 100%;
+  padding: 12px;
+  background: #27ae60;
+  color: white;
+  border: none;
+  border-radius: 10px;
+  font-size: 16px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background 0.3s;
+}
+
+.btn-login:hover:not(:disabled) {
+  background: #219a52;
+}
+
+.btn-login:disabled {
+  background: #95a5a6;
+  cursor: not-allowed;
+}
+
+.registro-link {
+  text-align: center;
+  margin-top: 16px;
+  font-size: 14px;
+  color: #7f8c8d;
+}
+
+.registro-link a {
+  color: #2980b9;
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.registro-link a:hover {
+  text-decoration: underline;
+}
+
+.mensaje-ambiental-login {
+  margin-top: 24px;
+  padding: 16px;
+  background: #eafaf1;
+  border-radius: 12px;
+  border-left: 4px solid #27ae60;
+  font-size: 14px;
+  color: #1a5276;
+  text-align: center;
+}
+
+.mensaje-ambiental-login .datos-impacto {
+  font-size: 13px;
+  color: #2c3e50;
+  margin-top: 6px;
+}
+
+.mensaje-error {
+  padding: 10px 14px;
+  background: #fadbd8;
+  color: #922b21;
+  border-radius: 8px;
+  margin-bottom: 16px;
+  border-left: 4px solid #e74c3c;
+  font-size: 14px;
+} 

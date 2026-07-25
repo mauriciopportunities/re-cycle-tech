@@ -1,0 +1,117 @@
+.registro-usuario-container {
+  max-width: 420px;
+  margin: 40px auto;
+  padding: 32px;
+  background: #ffffff;
+  border-radius: 16px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+  border: 1px solid #e8ecf0;
+}
+
+.registro-usuario-container h2 {
+  color: #2c3e50;
+  text-align: center;
+  margin-bottom: 4px;
+  font-size: 28px;
+}
+
+.registro-usuario-container .subtitulo {
+  text-align: center;
+  color: #7f8c8d;
+  margin-bottom: 24px;
+  font-size: 14px;
+}
+
+.registro-form .campo {
+  margin-bottom: 18px;
+}
+
+.registro-form label {
+  display: block;
+  font-weight: 600;
+  margin-bottom: 6px;
+  color: #2c3e50;
+  font-size: 14px;
+}
+
+.registro-form input {
+  width: 100%;
+  padding: 10px 14px;
+  border: 2px solid #dce1e6;
+  border-radius: 10px;
+  font-size: 14px;
+  transition: border-color 0.3s;
+  box-sizing: border-box;
+}
+
+.registro-form input:focus {
+  border-color: #27ae60;
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(39, 174, 96, 0.15);
+}
+
+.btn-registro-usuario {
+  width: 100%;
+  padding: 12px;
+  background: #27ae60;
+  color: white;
+  border: none;
+  border-radius: 10px;
+  font-size: 16px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background 0.3s;
+}
+
+.btn-registro-usuario:hover:not(:disabled) {
+  background: #219a52;
+}
+
+.btn-registro-usuario:disabled {
+  background: #95a5a6;
+  cursor: not-allowed;
+}
+
+.login-link {
+  text-align: center;
+  margin-top: 16px;
+  font-size: 14px;
+  color: #7f8c8d;
+}
+
+.login-link a {
+  color: #2980b9;
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.login-link a:hover {
+  text-decoration: underline;
+}
+
+.mensaje-ambiental-registro {
+  margin-top: 24px;
+  padding: 16px;
+  background: #eafaf1;
+  border-radius: 12px;
+  border-left: 4px solid #27ae60;
+  font-size: 14px;
+  color: #1a5276;
+  text-align: center;
+}
+
+.mensaje-ambiental-registro .datos-impacto {
+  font-size: 13px;
+  color: #2c3e50;
+  margin-top: 6px;
+}
+
+.mensaje-exito {
+  padding: 10px 14px;
+  background: #d5f5e3;
+  color: #1a7a42;
+  border-radius: 8px;
+  margin-bottom: 16px;
+  border-left: 4px solid #27ae60;
+  font-size: 14px;
+} 
