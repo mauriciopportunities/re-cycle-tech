@@ -20,22 +20,35 @@ public class TrazabilidadService {
         private final TrazabilidadRepository trazabilidadRepository;
         private final ResiduoRepository residuoRepository;
 
-        // ✅ @NonNull en residuoId
         public List<Trazabilidad> getTrazabilidadByResiduo(@NonNull Long residuoId) {
+                System.out.println("🔍 DEBUG: getTrazabilidadByResiduo llamado con ID: " + residuoId);
+
                 Residuo residuo = residuoRepository.findById(residuoId)
                                 .orElseThrow(() -> new RuntimeException("Residuo no encontrado con id: " + residuoId));
-                return trazabilidadRepository.findByResiduoOrderByFechaCambioAsc(residuo);
+
+                List<Trazabilidad> resultado = trazabilidadRepository.findByResiduoOrderByFechaCambioAsc(residuo);
+                System.out.println("🔍 DEBUG: getTrazabilidadByResiduo devuelve " + resultado.size() + " registros");
+
+                return resultado;
         }
 
-        // ✅ @NonNull en residuoId y nuevoEstado
         public Trazabilidad registrarCambioEstado(@NonNull Long residuoId, @NonNull String nuevoEstado,
                         Usuario responsable, String observaciones) {
+
+                System.out.println("🔍 DEBUG: registrarCambioEstado llamado con residuoId=" + residuoId
+                                + ", nuevoEstado=" + nuevoEstado);
+                System.out.println("🔍 DEBUG: responsable=" + (responsable != null ? responsable.getNombre() : "null")
+                                + ", observaciones=" + observaciones);
+
                 if (nuevoEstado.isEmpty()) {
                         throw new IllegalArgumentException("El nuevo estado no puede ser vacío");
                 }
 
                 Residuo residuo = residuoRepository.findById(residuoId)
                                 .orElseThrow(() -> new RuntimeException("Residuo no encontrado con id: " + residuoId));
+
+                System.out.println("🔍 DEBUG: Residuo encontrado, estado actual=" + residuo.getEstado() + ", tipo="
+                                + residuo.getTipo());
 
                 Trazabilidad trazabilidad = Trazabilidad.builder()
                                 .residuo(residuo)
@@ -45,15 +58,22 @@ public class TrazabilidadService {
                                 .observaciones(observaciones)
                                 .build();
 
+                System.out.println("🔍 DEBUG: Trazabilidad creada: estadoAnterior=" + trazabilidad.getEstadoAnterior() +
+                                ", estadoNuevo=" + trazabilidad.getEstadoNuevo());
+
                 residuo.setEstado(nuevoEstado);
                 residuoRepository.save(residuo);
+                System.out.println("🔍 DEBUG: Residuo actualizado en BD");
 
-                // ✅ @NonNull en trazabilidad
-                return guardarTrazabilidad(trazabilidad);
+                // Guardar trazabilidad
+                Trazabilidad saved = trazabilidadRepository.save(trazabilidad);
+                System.out.println("🔍 DEBUG: Trazabilidad guardada con ID: " + saved.getId());
+
+                return saved;
         }
 
-        // ✅ @NonNull en trazabilidad
         public Trazabilidad guardarTrazabilidad(@NonNull Trazabilidad trazabilidad) {
+                System.out.println("🔍 DEBUG: guardarTrazabilidad llamado");
                 return trazabilidadRepository.save(trazabilidad);
         }
 }

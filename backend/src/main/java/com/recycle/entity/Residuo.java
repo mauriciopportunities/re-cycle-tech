@@ -1,13 +1,25 @@
 package com.recycle.entity;
 
-import jakarta.persistence.*;
+import java.time.LocalDateTime;
+import java.util.List;
+
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
+import jakarta.persistence.CascadeType;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToMany;
+import jakarta.persistence.PrePersist;
+import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-
-import java.time.LocalDateTime;
-import java.util.List;
 
 @Entity
 @Table(name = "residuo")
@@ -23,6 +35,7 @@ public class Residuo {
 
     @ManyToOne
     @JoinColumn(name = "usuario_id", nullable = false)
+    @JsonIgnore // ✅ Evita el bucle infinito con Usuario
     private Usuario usuario;
 
     @ManyToOne
@@ -46,10 +59,11 @@ public class Residuo {
     private LocalDateTime fechaRegistro;
 
     @OneToMany(mappedBy = "residuo", cascade = CascadeType.ALL)
+    @JsonIgnore // ✅ Evita el bucle infinito con Trazabilidad
     private List<Trazabilidad> trazabilidades;
 
     @PrePersist
     protected void onCreate() {
         fechaRegistro = LocalDateTime.now();
     }
-} 
+}

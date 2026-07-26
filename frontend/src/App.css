@@ -1,12 +1,317 @@
 /* ============================================================
-   ESTILOS PRINCIPALES DE LA APLICACIÓN
+   ESTILOS PRINCIPALES
    ============================================================ */
 
 .App {
   text-align: center;
-  padding: 20px;
-  font-family: Arial, sans-serif;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  background: #f0f4f8;
 }
+
+/* ============================================================
+   HEADER MODERNO
+   ============================================================ */
+
+.app-header-modern {
+  background: linear-gradient(135deg, #0f2b3d 0%, #1a4a5e 100%);
+  padding: 0 24px;
+  border-bottom: 3px solid #2ecc71;
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+}
+
+.nav-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  height: 72px;
+}
+
+/* Logo */
+.nav-logo-modern {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  text-decoration: none;
+  color: white;
+  font-weight: 700;
+  font-size: 22px;
+  transition: transform 0.3s;
+}
+
+.nav-logo-modern:hover {
+  transform: scale(1.02);
+}
+
+.logo-icon {
+  font-size: 30px;
+}
+
+.logo-text {
+  background: linear-gradient(to right, #2ecc71, #27ae60);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* Menú de navegación */
+.nav-menu {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+/* Enlaces de navegación */
+.nav-link-modern {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 18px;
+  border-radius: 10px;
+  text-decoration: none;
+  color: #b0d4e3;
+  font-weight: 600;
+  font-size: 14px;
+  transition: all 0.3s ease;
+  position: relative;
+}
+
+.nav-link-modern .nav-icon {
+  font-size: 16px;
+}
+
+.nav-link-modern:hover {
+  color: white;
+  background: rgba(46, 204, 113, 0.15);
+  transform: translateY(-1px);
+}
+
+/* Enlace activo (para página actual) */
+.nav-link-modern.active {
+  color: #2ecc71;
+  background: rgba(46, 204, 113, 0.1);
+}
+
+/* Enlaces específicos */
+.nav-link-mapa {
+  color: #b0d4e3;
+}
+
+.nav-link-mapa:hover {
+  color: white;
+}
+
+.nav-link-registrar {
+  color: #b0d4e3;
+}
+
+.nav-link-registrar:hover {
+  color: white;
+}
+
+.nav-link-trazabilidad {
+  color: #b0d4e3;
+}
+
+.nav-link-trazabilidad:hover {
+  color: white;
+}
+
+/* ============================================================
+   BOTONES DE AUTENTICACIÓN
+   ============================================================ */
+
+.nav-auth {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-left: 4px;
+}
+
+/* Botón Login */
+.btn-login {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 20px;
+  border-radius: 10px;
+  text-decoration: none;
+  font-weight: 600;
+  font-size: 14px;
+  color: white;
+  background: rgba(46, 204, 113, 0.2);
+  border: 1px solid rgba(46, 204, 113, 0.3);
+  transition: all 0.3s ease;
+}
+
+.btn-login:hover {
+  background: rgba(46, 204, 113, 0.35);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 15px rgba(46, 204, 113, 0.2);
+}
+
+/* Botón Registrarse (destacado) */
+.btn-registro-usuario {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 22px;
+  border-radius: 10px;
+  text-decoration: none;
+  font-weight: 700;
+  font-size: 14px;
+  color: #0f2b3d;
+  background: linear-gradient(135deg, #2ecc71, #27ae60);
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 15px rgba(46, 204, 113, 0.3);
+}
+
+.btn-registro-usuario:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 25px rgba(46, 204, 113, 0.4);
+}
+
+/* Badge de usuario autenticado */
+.nav-user-badge {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 4px 12px 4px 4px;
+  border-radius: 30px;
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  transition: all 0.3s;
+}
+
+.nav-user-badge:hover {
+  background: rgba(255, 255, 255, 0.12);
+}
+
+.user-avatar {
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #2ecc71, #27ae60);
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  font-size: 14px;
+  text-transform: uppercase;
+}
+
+.user-name {
+  color: white;
+  font-weight: 600;
+  font-size: 14px;
+}
+
+/* Botón Cerrar sesión */
+.btn-logout-modern {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 16px;
+  border-radius: 10px;
+  border: none;
+  background: rgba(231, 76, 60, 0.15);
+  color: #e74c3c;
+  font-weight: 600;
+  font-size: 14px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.btn-logout-modern:hover {
+  background: rgba(231, 76, 60, 0.3);
+  transform: translateY(-2px);
+}
+
+/* ============================================================
+   MENÚ MÓVIL
+   ============================================================ */
+
+.nav-toggle {
+  display: none;
+  flex-direction: column;
+  gap: 5px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 8px;
+}
+
+.nav-toggle .bar {
+  width: 28px;
+  height: 3px;
+  background: white;
+  border-radius: 3px;
+  transition: all 0.3s;
+}
+
+/* ============================================================
+   RESPONSIVE
+   ============================================================ */
+
+@media (max-width: 768px) {
+  .nav-toggle {
+    display: flex;
+  }
+
+  .nav-menu {
+    display: none;
+    width: 100%;
+    flex-direction: column;
+    align-items: stretch;
+    padding: 16px 0;
+    gap: 4px;
+  }
+
+  .nav-menu.open {
+    display: flex;
+  }
+
+  .nav-auth {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .nav-link-modern {
+    padding: 12px 16px;
+    justify-content: center;
+  }
+
+  .btn-login,
+  .btn-registro-usuario,
+  .btn-logout-modern {
+    justify-content: center;
+    padding: 12px;
+  }
+
+  .nav-user-badge {
+    justify-content: center;
+    padding: 6px 16px;
+  }
+
+  .nav-container {
+    flex-wrap: wrap;
+    height: auto;
+    padding: 12px 0;
+  }
+}
+
+/* ============================================================
+   RESTAURAR ESTILOS ANTERIORES (para componentes)
+   ============================================================ */
 
 .App h1 {
   color: #2c3e50;
@@ -30,58 +335,9 @@ li {
 }
 
 /* ============================================================
-   ESTILOS DE NAVEGACIÓN
-   ============================================================ */
-
-.app-header {
-  background: linear-gradient(135deg, #1a3b4f 0%, #0f2b3d 100%);
-  padding: 12px 24px;
-  border-radius: 12px;
-  margin-bottom: 20px;
-  border-bottom: 3px solid #2ecc71;
-}
-
-.nav-principal {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  max-width: 1200px;
-  margin: 0 auto;
-  flex-wrap: wrap;
-  gap: 12px;
-}
-
-.nav-logo {
-  font-size: 22px;
-  font-weight: 700;
-  color: #2ecc71;
-  text-decoration: none;
-}
-
-.nav-links {
-  display: flex;
-  gap: 20px;
-}
-
-.nav-link {
-  color: #e8f4f8;
-  text-decoration: none;
-  font-weight: 600;
-  padding: 6px 14px;
-  border-radius: 8px;
-  transition: background 0.3s, color 0.3s;
-}
-
-.nav-link:hover {
-  background: rgba(46, 204, 113, 0.2);
-  color: #2ecc71;
-}
-
-/* ============================================================
    ESTILOS PARA INFOWINDOW DE GOOGLE MAPS
    ============================================================ */
 
-/* InfoWindow para el usuario (marcador azul) */
 .info-window-usuario {
   padding: 8px 4px;
   font-family: Arial, sans-serif;
@@ -115,7 +371,6 @@ li {
   font-size: 12px !important;
 }
 
-/* InfoWindow para los centros de acopio (marcadores rojos) */
 .info-window-centro {
   padding: 8px 4px;
   font-family: Arial, sans-serif;
@@ -142,7 +397,6 @@ li {
   color: #1a5276;
 }
 
-/* Información de ubicación en la página */
 .info-ubicacion {
   font-size: 14px;
   color: #2980b9;
@@ -160,13 +414,11 @@ li {
   margin-bottom: 12px;
 }
 
-/* Contenedor del mapa */
 .mapa-container {
   max-width: 100%;
   padding: 10px 0;
 }
 
-/* Mensaje de carga y error */
 .cargando {
   padding: 40px;
   font-size: 18px;
@@ -181,7 +433,6 @@ li {
   border-radius: 8px;
 }
 
-/* Lista de centros debajo del mapa */
 .lista-centros {
   list-style: none;
   padding: 0;
@@ -215,10 +466,6 @@ li {
   font-size: 13px;
 }
 
-/* ============================================================
-   ESTILOS RESPONSIVE
-   ============================================================ */
-
 @media (max-width: 768px) {
   .info-window-usuario,
   .info-window-centro {
@@ -238,16 +485,5 @@ li {
   .info-ubicacion {
     font-size: 12px;
     padding: 6px 12px;
-  }
-}
-
-@media (max-width: 600px) {
-  .nav-principal {
-    flex-direction: column;
-    align-items: center;
-  }
-  
-  .nav-links {
-    gap: 12px;
   }
 } 

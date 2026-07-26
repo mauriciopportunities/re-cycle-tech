@@ -1,0 +1,304 @@
+/* ============================================================
+   ESTILOS DE TRAZABILIDAD
+   ============================================================ */
+
+.trazabilidad-container {
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 24px;
+  background: #ffffff;
+  border-radius: 16px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+  border: 1px solid #e8ecf0;
+}
+
+.trazabilidad-container h2 {
+  color: #2c3e50;
+  text-align: center;
+  margin-bottom: 12px;
+  font-size: 28px;
+}
+
+.btn-volver {
+  background: #7f8c8d;
+  color: white;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: 600;
+  margin-bottom: 16px;
+  transition: background 0.3s;
+}
+
+.btn-volver:hover {
+  background: #5d6d7e;
+}
+
+/* Residuo info */
+.residuo-info {
+  background: #f8f9fa;
+  border-radius: 12px;
+  padding: 16px 20px;
+  margin-bottom: 24px;
+  border: 1px solid #e8ecf0;
+}
+
+.residuo-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-bottom: 8px;
+}
+
+.residuo-header h3 {
+  margin: 0;
+  color: #2c3e50;
+}
+
+.estado-actual {
+  display: inline-block;
+  padding: 4px 14px;
+  border-radius: 20px;
+  font-weight: 700;
+  font-size: 14px;
+  color: white;
+}
+
+.residuo-detalles p {
+  margin: 4px 0;
+  font-size: 14px;
+  color: #2c3e50;
+}
+
+/* Línea de tiempo */
+.linea-tiempo {
+  margin: 24px 0;
+}
+
+.linea-tiempo h3 {
+  color: #2c3e50;
+  border-bottom: 2px solid #e8ecf0;
+  padding-bottom: 8px;
+}
+
+.sin-registros {
+  color: #7f8c8d;
+  font-style: italic;
+  text-align: center;
+  padding: 20px;
+}
+
+.timeline {
+  position: relative;
+  padding-left: 30px;
+}
+
+.timeline::before {
+  content: '';
+  position: absolute;
+  left: 8px;
+  top: 0;
+  bottom: 0;
+  width: 3px;
+  background: #dce1e6;
+}
+
+.timeline-item {
+  display: flex;
+  gap: 16px;
+  margin-bottom: 20px;
+  position: relative;
+}
+
+.timeline-icon {
+  font-size: 22px;
+  width: 36px;
+  height: 36px;
+  background: white;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 3px solid #dce1e6;
+  flex-shrink: 0;
+  z-index: 1;
+}
+
+.timeline-content {
+  flex: 1;
+  background: #f8f9fa;
+  padding: 12px 16px;
+  border-radius: 10px;
+  border: 1px solid #e8ecf0;
+}
+
+.timeline-estado {
+  display: inline-block;
+  padding: 2px 12px;
+  border-radius: 12px;
+  font-weight: 700;
+  font-size: 13px;
+  color: white;
+}
+
+.timeline-detalle {
+  margin-top: 4px;
+  font-size: 13px;
+  color: #2c3e50;
+}
+
+.timeline-fecha {
+  color: #7f8c8d;
+  font-size: 12px;
+}
+
+.timeline-transicion {
+  color: #95a5a6;
+  font-size: 12px;
+  margin-left: 8px;
+}
+
+.timeline-observaciones {
+  margin: 4px 0 0 0;
+  color: #5d6d7e;
+  font-size: 13px;
+  background: #ffffff;
+  padding: 4px 10px;
+  border-radius: 6px;
+  border-left: 3px solid #27ae60;
+}
+
+/* Cambiar estado */
+.cambiar-estado {
+  background: #eafaf1;
+  border-radius: 12px;
+  padding: 20px;
+  margin: 20px 0;
+  border: 2px solid #d5e8db;
+}
+
+.cambiar-estado h3 {
+  color: #1a5276;
+  margin-bottom: 16px;
+}
+
+.cambiar-estado .campo {
+  margin-bottom: 12px;
+}
+
+.cambiar-estado label {
+  display: block;
+  font-weight: 600;
+  margin-bottom: 4px;
+  color: #2c3e50;
+  font-size: 14px;
+}
+
+.select-estado,
+.input-observaciones {
+  width: 100%;
+  padding: 10px 14px;
+  border: 2px solid #dce1e6;
+  border-radius: 10px;
+  font-size: 14px;
+  transition: border-color 0.3s;
+  box-sizing: border-box;
+}
+
+.select-estado:focus,
+.input-observaciones:focus {
+  border-color: #27ae60;
+  outline: none;
+}
+
+.btn-cambiar-estado {
+  width: 100%;
+  padding: 12px;
+  background: #27ae60;
+  color: white;
+  border: none;
+  border-radius: 10px;
+  font-size: 16px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background 0.3s;
+}
+
+.btn-cambiar-estado:hover {
+  background: #219a52;
+}
+
+.mensaje-inmutabilidad {
+  margin-top: 12px;
+  font-size: 13px;
+  color: #7f8c8d;
+  text-align: center;
+  padding: 8px;
+  background: #f8f9fa;
+  border-radius: 8px;
+}
+
+.mensaje-solo-lectura {
+  background: #fef9e7;
+  border: 1px solid #f9e79f;
+  border-radius: 10px;
+  padding: 12px 16px;
+  margin: 16px 0;
+  color: #7d6608;
+  text-align: center;
+}
+
+/* Mensajes */
+.mensaje-exito {
+  padding: 10px 14px;
+  background: #d5f5e3;
+  color: #1a7a42;
+  border-radius: 8px;
+  margin-bottom: 16px;
+  border-left: 4px solid #27ae60;
+}
+
+.mensaje-ambiental-trazabilidad {
+  margin-top: 20px;
+  padding: 16px;
+  background: linear-gradient(135deg, #eafaf1 0%, #d5f5e3 100%);
+  border-radius: 12px;
+  border-left: 4px solid #27ae60;
+  font-size: 14px;
+  color: #1a5276;
+}
+
+.mensaje-ambiental-trazabilidad .datos-impacto {
+  font-size: 13px;
+  color: #2c3e50;
+  margin-top: 6px;
+  background: rgba(255, 255, 255, 0.6);
+  padding: 6px 12px;
+  border-radius: 8px;
+}
+
+/* Responsive */
+@media (max-width: 600px) {
+  .trazabilidad-container {
+    padding: 16px;
+    margin: 0 10px;
+  }
+  
+  .residuo-header {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+  
+  .timeline {
+    padding-left: 16px;
+  }
+  
+  .timeline-icon {
+    width: 28px;
+    height: 28px;
+    font-size: 16px;
+  }
+} 
