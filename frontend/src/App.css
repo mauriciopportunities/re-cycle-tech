@@ -137,21 +137,24 @@
 }
 
 /* ============================================================
-   BOTONES DE AUTENTICACIÓN
+   BOTONES DE AUTENTICACIÓN (Menú superior)
    ============================================================ */
 
 .nav-auth {
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 10px;
   margin-left: 4px;
 }
 
 .btn-login {
   display: flex;
   align-items: center;
+  justify-content: center;
   gap: 6px;
-  padding: 8px 20px;
+  padding: 10px 24px;
+  min-width: 140px;
+  height: 44px;
   border-radius: 10px;
   text-decoration: none;
   font-weight: 600;
@@ -160,6 +163,7 @@
   background: rgba(46, 204, 113, 0.2);
   border: 1px solid rgba(46, 204, 113, 0.3);
   transition: all 0.3s ease;
+  box-sizing: border-box;
 }
 
 .btn-login:hover {
@@ -171,8 +175,11 @@
 .btn-registro-usuario {
   display: flex;
   align-items: center;
+  justify-content: center;
   gap: 6px;
-  padding: 8px 22px;
+  padding: 10px 24px;
+  min-width: 140px;
+  height: 44px;
   border-radius: 10px;
   text-decoration: none;
   font-weight: 700;
@@ -181,12 +188,17 @@
   background: linear-gradient(135deg, #2ecc71, #27ae60);
   transition: all 0.3s ease;
   box-shadow: 0 4px 15px rgba(46, 204, 113, 0.3);
+  box-sizing: border-box;
 }
 
 .btn-registro-usuario:hover {
   transform: translateY(-2px);
   box-shadow: 0 6px 25px rgba(46, 204, 113, 0.4);
 }
+
+/* ============================================================
+   USUARIO AUTENTICADO
+   ============================================================ */
 
 .nav-user-badge {
   display: flex;
@@ -302,6 +314,8 @@
   .btn-logout-modern {
     justify-content: center;
     padding: 12px;
+    min-width: unset;
+    height: 44px;
   }
 
   .nav-user-badge {

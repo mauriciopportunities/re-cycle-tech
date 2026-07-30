@@ -4,10 +4,10 @@ import { Link, Route, BrowserRouter as Router, Routes } from 'react-router-dom';
 import './App.css';
 import FooterAmbiental from './components/FooterAmbiental';
 import ListaResiduos from './components/ListaResiduos';
-import MapaCentros from './components/MapaCentros';
 import RegistrarResiduo from './components/RegistrarResiduo';
 import Trazabilidad from './components/Trazabilidad';
 import AdminPanel from './pages/AdminPanel';
+import HomePage from './pages/HomePage';
 import Login from './pages/Login';
 import RegistroUsuario from './pages/RegistroUsuario';
 
@@ -140,7 +140,8 @@ function App() {
 
         <main className="app-main">
           <Routes>
-            <Route path="/" element={<MapaCentros />} />
+            {/* ✅ Nueva página de inicio con diseño profesional */}
+            <Route path="/" element={<HomePage />} />
             <Route path="/registrar" element={<RegistrarResiduo />} />
             <Route path="/login" element={<Login />} />
             <Route path="/registro-usuario" element={<RegistroUsuario />} />
