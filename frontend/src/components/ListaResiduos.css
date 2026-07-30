@@ -1,0 +1,98 @@
+.lista-residuos-container {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 24px;
+}
+
+.lista-residuos-container h2 {
+  color: #2c3e50;
+  border-bottom: 3px solid #2ecc71;
+  padding-bottom: 12px;
+  margin-bottom: 20px;
+}
+
+.tabla-residuos {
+  width: 100%;
+  border-collapse: collapse;
+  background: white;
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.08);
+}
+
+.tabla-residuos th {
+  background: #f1f5f9;
+  padding: 12px 16px;
+  text-align: left;
+  font-weight: 600;
+  color: #2c3e50;
+}
+
+.tabla-residuos td {
+  padding: 10px 16px;
+  border-bottom: 1px solid #eef3f7;
+}
+
+.tabla-residuos tr:hover {
+  background: #f8fafc;
+}
+
+.estado-badge {
+  display: inline-block;
+  padding: 4px 12px;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.estado-registrado {
+  background: #e3f2fd;
+  color: #0d47a1;
+}
+
+.estado-pendiente_entrega {
+  background: #fff3e0;
+  color: #e65100;
+}
+
+.estado-recibido_en_centro {
+  background: #e8f5e9;
+  color: #2e7d32;
+}
+
+.estado-clasificado {
+  background: #f3e5f5;
+  color: #6a1b9a;
+}
+
+.estado-donado, .estado-reciclado, .estado-reacondicionado {
+  background: #e8f5e9;
+  color: #1e7e34;
+}
+
+.estado-destruccion_segura {
+  background: #ffebee;
+  color: #c62828;
+}
+
+.btn-ver-trazabilidad {
+  padding: 6px 14px;
+  background: #2ecc71;
+  color: white;
+  border-radius: 8px;
+  text-decoration: none;
+  font-size: 13px;
+  font-weight: 600;
+  transition: background 0.3s;
+}
+
+.btn-ver-trazabilidad:hover {
+  background: #27ae60;
+}
+
+.sin-registros {
+  text-align: center;
+  color: #7f8c8d;
+  padding: 40px;
+  font-size: 18px;
+} 

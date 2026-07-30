@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -19,6 +20,7 @@ import com.recycle.dto.ResiduoRequest;
 import com.recycle.dto.ResiduoResponse;
 import com.recycle.entity.Residuo;
 import com.recycle.entity.Usuario;
+import com.recycle.security.JwtUtil;
 import com.recycle.service.ResiduoService;
 import com.recycle.service.UsuarioService;
 
@@ -32,15 +34,18 @@ public class ResiduoController {
 
     private final ResiduoService residuoService;
     private final UsuarioService usuarioService;
-
-    // ⚠️ TEMPORAL: Usuario fijo para pruebas (reemplazar con JWT después)
-    private Long USUARIO_PRUEBA_ID = 1L;
+    private final JwtUtil jwtUtil;
 
     @PostMapping
-    public ResponseEntity<?> registrarResiduo(@Valid @RequestBody ResiduoRequest request) {
+    public ResponseEntity<?> registrarResiduo(
+            @RequestHeader("Authorization") String authHeader,
+            @Valid @RequestBody ResiduoRequest request) {
         try {
-            Usuario usuario = usuarioService.findById(USUARIO_PRUEBA_ID)
-                    .orElseThrow(() -> new RuntimeException("Usuario de prueba no encontrado"));
+            String token = authHeader.substring(7);
+            Long usuarioId = jwtUtil.extractUsuarioId(token);
+
+            Usuario usuario = usuarioService.findById(usuarioId)
+                    .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
 
             Residuo residuo = Residuo.builder()
                     .usuario(usuario)
@@ -69,9 +74,12 @@ public class ResiduoController {
     }
 
     @GetMapping("/mis-residuos")
-    public ResponseEntity<List<ResiduoResponse>> getMisResiduos() {
-        // ⚠️ TEMPORAL: Usuario fijo para pruebas
-        Usuario usuario = usuarioService.findById(USUARIO_PRUEBA_ID)
+    public ResponseEntity<List<ResiduoResponse>> getMisResiduos(
+            @RequestHeader("Authorization") String authHeader) {
+        String token = authHeader.substring(7);
+        Long usuarioId = jwtUtil.extractUsuarioId(token);
+
+        Usuario usuario = usuarioService.findById(usuarioId)
                 .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
 
         List<Residuo> residuos = residuoService.getResiduosByUsuario(usuario);
@@ -91,7 +99,10 @@ public class ResiduoController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<ResiduoResponse> getResiduoById(@PathVariable Long id) {
+    public ResponseEntity<ResiduoResponse> getResiduoById(
+            @RequestHeader("Authorization") String authHeader,
+            @PathVariable Long id) {
+        // Verificar token (opcional, pero se puede usar para logging)
         Residuo residuo = residuoService.getResiduoById(id);
 
         ResiduoResponse response = ResiduoResponse.builder()
@@ -107,12 +118,35 @@ public class ResiduoController {
     }
 
     @PutMapping("/{id}/estado")
-    public ResponseEntity<?> actualizarEstado(@PathVariable Long id, @RequestParam String nuevoEstado) {
+    public ResponseEntity<?> actualizarEstado(
+            @PathVariable Long id,
+            @RequestParam String nuevoEstado) {
         try {
             Residuo residuo = residuoService.actualizarEstado(id, nuevoEstado);
-            return ResponseEntity.ok(Map.of("mensaje", "Estado actualizado", "nuevoEstado", residuo.getEstado()));
+            return ResponseEntity.ok(Map.of(
+                    "mensaje", "Estado actualizado",
+                    "nuevoEstado", residuo.getEstado()));
         } catch (Exception e) {
             return ResponseEntity.badRequest().body(Map.of("error", e.getMessage()));
         }
+    }
+
+    // ✅ NUEVO ENDPOINT: Obtener todos los residuos (solo para operadores y admin)
+    @GetMapping("/todos")
+    public ResponseEntity<List<ResiduoResponse>> getAllResiduos() {
+        List<Residuo> residuos = residuoService.getAllResiduos();
+
+        List<ResiduoResponse> responses = residuos.stream()
+                .map(r -> ResiduoResponse.builder()
+                        .id(r.getId())
+                        .tipo(r.getTipo())
+                        .descripcion(r.getDescripcion())
+                        .estado(r.getEstado())
+                        .fechaRegistro(r.getFechaRegistro())
+                        .usuarioId(r.getUsuario().getId())
+                        .build())
+                .collect(Collectors.toList());
+
+        return ResponseEntity.ok(responses);
     }
 }

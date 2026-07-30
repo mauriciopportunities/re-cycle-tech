@@ -3,30 +3,33 @@ import { useEffect, useState } from 'react';
 import { Link, Route, BrowserRouter as Router, Routes } from 'react-router-dom';
 import './App.css';
 import FooterAmbiental from './components/FooterAmbiental';
+import ListaResiduos from './components/ListaResiduos';
 import MapaCentros from './components/MapaCentros';
 import RegistrarResiduo from './components/RegistrarResiduo';
 import Trazabilidad from './components/Trazabilidad';
+import AdminPanel from './pages/AdminPanel';
 import Login from './pages/Login';
 import RegistroUsuario from './pages/RegistroUsuario';
 
 function App() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [userName, setUserName] = useState('');
+  const [rol, setRol] = useState('');
   const [ultimoResiduoId, setUltimoResiduoId] = useState(1);
 
-  // Verificar autenticación al cargar la aplicación
   useEffect(() => {
     const token = localStorage.getItem('token');
     const nombre = localStorage.getItem('nombre');
+    const userRol = localStorage.getItem('rol');
     
     if (token) {
       setIsAuthenticated(true);
       setUserName(nombre || 'Usuario');
+      setRol(userRol || '');
       obtenerUltimoResiduo(token);
     }
   }, []);
 
-  // Obtener el último residuo registrado por el usuario
   const obtenerUltimoResiduo = async (token) => {
     try {
       const response = await axios.get(
@@ -35,12 +38,8 @@ function App() {
       );
       
       if (response.data && response.data.length > 0) {
-        // Obtener el residuo con el ID más alto (el último registrado)
         const ultimo = response.data.reduce((max, r) => r.id > max.id ? r : max);
         setUltimoResiduoId(ultimo.id);
-        console.log('📌 Último residuo ID:', ultimo.id);
-      } else {
-        console.log('📌 No hay residuos registrados');
       }
     } catch (error) {
       console.error('❌ Error al obtener residuos:', error);
@@ -54,10 +53,10 @@ function App() {
     localStorage.removeItem('rol');
     setIsAuthenticated(false);
     setUserName('');
+    setRol('');
     window.location.href = '/';
   };
 
-  // Obtener iniciales del usuario para el avatar
   const getInitials = (name) => {
     return name ? name.charAt(0).toUpperCase() : 'U';
   };
@@ -75,20 +74,35 @@ function App() {
 
             {/* Menú de navegación */}
             <div className="nav-menu">
-              {/* Enlaces principales */}
+              {/* Mapa - Siempre visible */}
               <Link to="/" className="nav-link-modern nav-link-mapa">
                 <span className="nav-icon">📍</span> Mapa
               </Link>
 
+              {/* Enlaces para usuarios autenticados */}
               {isAuthenticated && (
                 <>
                   <Link to="/registrar" className="nav-link-modern nav-link-registrar">
                     <span className="nav-icon">📦</span> Registrar Residuo
                   </Link>
-                  {/* ✅ Trazabilidad dinámica: siempre muestra el último residuo */}
+                  
+                  {/* ✅ Lista de residuos (solo para operadores y admin) */}
+                  {(rol === 'OPERADOR_CENTRO' || rol === 'OPERADOR_TECNICO' || rol === 'ADMIN') && (
+                    <Link to="/residuos" className="nav-link-modern nav-link-residuos">
+                      <span className="nav-icon">📋</span> Todos los Residuos
+                    </Link>
+                  )}
+                  
                   <Link to={`/trazabilidad/${ultimoResiduoId}`} className="nav-link-modern nav-link-trazabilidad">
                     <span className="nav-icon">🔍</span> Trazabilidad
                   </Link>
+                  
+                  {/* ✅ Panel de administración (solo ADMIN) */}
+                  {rol === 'ADMIN' && (
+                    <Link to="/admin" className="nav-link-modern nav-link-admin">
+                      <span className="nav-icon">⚙️</span> Administrar
+                    </Link>
+                  )}
                 </>
               )}
 
@@ -115,7 +129,7 @@ function App() {
               )}
             </div>
 
-            {/* Menú móvil (toggle) */}
+            {/* Menú móvil */}
             <button className="nav-toggle" id="navToggle">
               <span className="bar"></span>
               <span className="bar"></span>
@@ -131,6 +145,8 @@ function App() {
             <Route path="/login" element={<Login />} />
             <Route path="/registro-usuario" element={<RegistroUsuario />} />
             <Route path="/trazabilidad/:id" element={<Trazabilidad />} />
+            <Route path="/admin" element={<AdminPanel />} />
+            <Route path="/residuos" element={<ListaResiduos />} />
           </Routes>
         </main>
 
