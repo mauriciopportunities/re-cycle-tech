@@ -1,0 +1,727 @@
+diff --git a/.env.example b/.env.example
+new file mode 100644
+index 0000000..fbdfb1d
+--- /dev/null
++++ b/.env.example
+@@ -0,0 +1,12 @@
++# Copiar este archivo a .env y ajustar valores reales antes de desplegar.
++# NUNCA subir el archivo .env (con secretos reales) al repositorio.
++
++DB_NAME=recycle_db
++DB_USERNAME=admin
++DB_PASSWORD=***REMOVED***
++DB_URL=jdbc:postgresql://localhost:5432/recycle_db
++
++# Generar una clave nueva y larga para producción, por ejemplo:
++#   openssl rand -base64 48
++JWT_SECRET=***REMOVED***
++JWT_EXPIRATION=86400000
+diff --git a/.gitignore b/.gitignore
+new file mode 100644
+index 0000000..4c49bd7
+--- /dev/null
++++ b/.gitignore
+@@ -0,0 +1 @@
++.env
+diff --git a/backend/src/main/java/com/recycle/config/SecurityConfig.java b/backend/src/main/java/com/recycle/config/SecurityConfig.java
+index 41b9ce8..2847908 100644
+--- a/backend/src/main/java/com/recycle/config/SecurityConfig.java
++++ b/backend/src/main/java/com/recycle/config/SecurityConfig.java
+@@ -4,6 +4,7 @@ import java.util.Arrays;
+ 
+ import org.springframework.context.annotation.Bean;
+ import org.springframework.context.annotation.Configuration;
++import org.springframework.http.HttpMethod;
+ import org.springframework.security.authentication.AuthenticationManager;
+ import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
+ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+@@ -48,11 +49,33 @@ public class SecurityConfig {
+                         // Auth y Test
+                         .requestMatchers("/api/auth/**").permitAll()
+                         .requestMatchers("/api/test/**").permitAll()
+-                        // Centros de acopio (públicos para consulta)
+-                        .requestMatchers("/api/centros/**").permitAll()
+-                        // ===== ENDPOINTS PROTEGIDOS =====
++
++                        // ===== CENTROS DE ACOPIO =====
++                        // Consulta pública (RF-07/RF-11 lectura), pero crear
++                        // centros ya NO es público: antes /api/centros/**
++                        // permitAll cubría también el POST, así que cualquiera
++                        // sin sesión podía dar de alta centros falsos.
++                        .requestMatchers(HttpMethod.GET, "/api/centros/**").permitAll()
++                        .requestMatchers(HttpMethod.POST, "/api/centros").hasRole("ADMIN")
++
++                        // ===== RESIDUOS =====
++                        // Antes solo exigían .authenticated() a nivel de
++                        // /api/residuos/**, así que cualquier CIUDADANO podía
++                        // ver /todos o cambiar el estado de cualquier residuo.
++                        .requestMatchers(HttpMethod.GET, "/api/residuos/todos")
++                        .hasAnyRole("OPERADOR_CENTRO", "OPERADOR_TECNICO", "ADMIN")
++                        .requestMatchers(HttpMethod.PUT, "/api/residuos/*/estado")
++                        .hasAnyRole("OPERADOR_CENTRO", "OPERADOR_TECNICO", "ADMIN")
+                         .requestMatchers("/api/residuos/**").authenticated()
+-                        .requestMatchers("/api/trazabilidad/**").authenticated()
++
++                        // ===== TRAZABILIDAD =====
++                        // Consultar el historial: cualquier usuario autenticado
++                        // (el ciudadano dueño del residuo, operadores, admin).
++                        // Cambiar el estado: solo operadores/admin (RF-06/PT07).
++                        .requestMatchers(HttpMethod.PUT, "/api/trazabilidad/*/estado")
++                        .hasAnyRole("OPERADOR_CENTRO", "OPERADOR_TECNICO", "ADMIN")
++                        .requestMatchers(HttpMethod.GET, "/api/trazabilidad/**").authenticated()
++
+                         // ===== ENDPOINTS SOLO ADMIN =====
+                         .requestMatchers("/api/admin/**").hasRole("ADMIN")
+                         .anyRequest().authenticated())
+@@ -86,4 +109,4 @@ public class SecurityConfig {
+     public AuthenticationManager authenticationManager(AuthenticationConfiguration config) throws Exception {
+         return config.getAuthenticationManager();
+     }
+-}
+\ No newline at end of file
++}
+diff --git a/backend/src/main/java/com/recycle/controller/CentroController.java b/backend/src/main/java/com/recycle/controller/CentroController.java
+index 9a3bbe7..cbf87bd 100644
+--- a/backend/src/main/java/com/recycle/controller/CentroController.java
++++ b/backend/src/main/java/com/recycle/controller/CentroController.java
+@@ -3,6 +3,7 @@ package com.recycle.controller;
+ import java.util.List;
+ 
+ import org.springframework.http.ResponseEntity;
++import org.springframework.security.access.prepost.PreAuthorize;
+ import org.springframework.web.bind.annotation.GetMapping;
+ import org.springframework.web.bind.annotation.PathVariable;
+ import org.springframework.web.bind.annotation.PostMapping;
+@@ -24,13 +25,17 @@ public class CentroController {
+ 
+     private final CentroService centroService;
+ 
++    /**
++     * RF-07: parámetro renombrado de 'limite' (cantidad) a 'radioKm' (radio
++     * real en kilómetros), por defecto 5 km según el criterio de aceptación.
++     */
+     @GetMapping("/cercanos")
+     public ResponseEntity<List<CentroCercanoResponse>> getCentrosCercanos(
+             @RequestParam double lat,
+             @RequestParam double lng,
+-            @RequestParam(defaultValue = "5") int limite) {
++            @RequestParam(defaultValue = "5") double radioKm) {
+ 
+-        List<CentroCercanoResponse> centros = centroService.getCentrosCercanos(lat, lng, limite);
++        List<CentroCercanoResponse> centros = centroService.getCentrosCercanos(lat, lng, radioKm);
+         return ResponseEntity.ok(centros);
+     }
+ 
+@@ -44,8 +49,13 @@ public class CentroController {
+         return ResponseEntity.ok(centroService.getCentroById(id));
+     }
+ 
++    // RF-11: antes este endpoint no tenía ninguna restricción de acceso
++    // (heredaba /api/centros/** permitAll de SecurityConfig), por lo que
++    // cualquier persona sin autenticarse podía crear centros de acopio.
++    // Ahora exige rol ADMIN (ver SecurityConfig y @PreAuthorize).
+     @PostMapping
++    @PreAuthorize("hasRole('ADMIN')")
+     public ResponseEntity<CentroAcopio> crearCentro(@RequestBody CentroAcopio centro) {
+         return ResponseEntity.ok(centroService.crearCentro(centro));
+     }
+-}
+\ No newline at end of file
++}
+diff --git a/backend/src/main/java/com/recycle/controller/ResiduoController.java b/backend/src/main/java/com/recycle/controller/ResiduoController.java
+index 25e473c..0322705 100644
+--- a/backend/src/main/java/com/recycle/controller/ResiduoController.java
++++ b/backend/src/main/java/com/recycle/controller/ResiduoController.java
+@@ -20,8 +20,10 @@ import com.recycle.dto.ResiduoRequest;
+ import com.recycle.dto.ResiduoResponse;
+ import com.recycle.entity.Residuo;
+ import com.recycle.entity.Usuario;
++import com.recycle.entity.Trazabilidad;
+ import com.recycle.security.JwtUtil;
+ import com.recycle.service.ResiduoService;
++import com.recycle.service.TrazabilidadService;
+ import com.recycle.service.UsuarioService;
+ 
+ import jakarta.validation.Valid;
+@@ -34,6 +36,7 @@ public class ResiduoController {
+ 
+     private final ResiduoService residuoService;
+     private final UsuarioService usuarioService;
++    private final TrazabilidadService trazabilidadService;
+     private final JwtUtil jwtUtil;
+ 
+     @PostMapping
+@@ -117,15 +120,32 @@ public class ResiduoController {
+         return ResponseEntity.ok(response);
+     }
+ 
++    // CORRECCIÓN: este endpoint llamaba directamente a
++    // ResiduoService.actualizarEstado(), lo que cambiaba el estado del
++    // residuo SIN dejar ningún registro en trazabilidad (rompía RNF-05,
++    // porque existía una vía de cambio de estado sin auditoría). Ahora
++    // delega en TrazabilidadService, igual que TrazabilidadController, para
++    // que todo cambio de estado quede en el historial inmutable atribuido
++    // al usuario autenticado. El control de rol (solo operadores/admin) se
++    // aplica en SecurityConfig.
+     @PutMapping("/{id}/estado")
+     public ResponseEntity<?> actualizarEstado(
++            @RequestHeader("Authorization") String authHeader,
+             @PathVariable Long id,
+-            @RequestParam String nuevoEstado) {
++            @RequestParam String nuevoEstado,
++            @RequestParam(required = false) String observaciones) {
+         try {
+-            Residuo residuo = residuoService.actualizarEstado(id, nuevoEstado);
++            String token = authHeader.substring(7);
++            Long usuarioId = jwtUtil.extractUsuarioId(token);
++            Usuario responsable = usuarioService.findById(usuarioId)
++                    .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
++
++            Trazabilidad trazabilidad = trazabilidadService.registrarCambioEstado(
++                    id, nuevoEstado, responsable, observaciones);
++
+             return ResponseEntity.ok(Map.of(
+                     "mensaje", "Estado actualizado",
+-                    "nuevoEstado", residuo.getEstado()));
++                    "nuevoEstado", trazabilidad.getEstadoNuevo()));
+         } catch (Exception e) {
+             return ResponseEntity.badRequest().body(Map.of("error", e.getMessage()));
+         }
+diff --git a/backend/src/main/java/com/recycle/controller/TrazabilidadController.java b/backend/src/main/java/com/recycle/controller/TrazabilidadController.java
+index 062772f..5cedf5c 100644
+--- a/backend/src/main/java/com/recycle/controller/TrazabilidadController.java
++++ b/backend/src/main/java/com/recycle/controller/TrazabilidadController.java
+@@ -7,12 +7,14 @@ import org.springframework.http.ResponseEntity;
+ import org.springframework.web.bind.annotation.GetMapping;
+ import org.springframework.web.bind.annotation.PathVariable;
+ import org.springframework.web.bind.annotation.PutMapping;
++import org.springframework.web.bind.annotation.RequestHeader;
+ import org.springframework.web.bind.annotation.RequestMapping;
+ import org.springframework.web.bind.annotation.RequestParam;
+ import org.springframework.web.bind.annotation.RestController;
+ 
+ import com.recycle.entity.Trazabilidad;
+ import com.recycle.entity.Usuario;
++import com.recycle.security.JwtUtil;
+ import com.recycle.service.TrazabilidadService;
+ import com.recycle.service.UsuarioService;
+ 
+@@ -25,9 +27,7 @@ public class TrazabilidadController {
+ 
+     private final TrazabilidadService trazabilidadService;
+     private final UsuarioService usuarioService;
+-
+-    // ⚠️ TEMPORAL: Usuario fijo para pruebas
+-    private Long USUARIO_PRUEBA_ID = 1L;
++    private final JwtUtil jwtUtil;
+ 
+     @GetMapping("/{residuoId}")
+     public ResponseEntity<List<Trazabilidad>> getTrazabilidadByResiduo(@PathVariable Long residuoId) {
+@@ -35,14 +35,26 @@ public class TrazabilidadController {
+         return ResponseEntity.ok(trazabilidades);
+     }
+ 
++    /**
++     * CORRECCIÓN: antes el "responsable" del cambio de estado era un
++     * USUARIO_PRUEBA_ID fijo (=1L), sin importar quién hiciera la llamada.
++     * Ahora se obtiene del JWT del usuario autenticado (mismo patrón que
++     * ResiduoController), para que la trazabilidad quede correctamente
++     * atribuida. El control de que solo OPERADOR_CENTRO/OPERADOR_TECNICO/
++     * ADMIN puedan llamar este endpoint se aplica en SecurityConfig.
++     */
+     @PutMapping("/{residuoId}/estado")
+     public ResponseEntity<?> cambiarEstado(
++            @RequestHeader("Authorization") String authHeader,
+             @PathVariable Long residuoId,
+             @RequestParam String nuevoEstado,
+             @RequestParam(required = false) String observaciones) {
+ 
+         try {
+-            Usuario responsable = usuarioService.findById(USUARIO_PRUEBA_ID)
++            String token = authHeader.substring(7);
++            Long usuarioId = jwtUtil.extractUsuarioId(token);
++
++            Usuario responsable = usuarioService.findById(usuarioId)
+                     .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
+ 
+             Trazabilidad trazabilidad = trazabilidadService.registrarCambioEstado(
+@@ -56,4 +68,4 @@ public class TrazabilidadController {
+             return ResponseEntity.badRequest().body(Map.of("error", e.getMessage()));
+         }
+     }
+-}
+\ No newline at end of file
++}
+diff --git a/backend/src/main/java/com/recycle/repository/CentroAcopioRepository.java b/backend/src/main/java/com/recycle/repository/CentroAcopioRepository.java
+index 01ccdb4..7b0174a 100644
+--- a/backend/src/main/java/com/recycle/repository/CentroAcopioRepository.java
++++ b/backend/src/main/java/com/recycle/repository/CentroAcopioRepository.java
+@@ -10,27 +10,40 @@ import com.recycle.entity.CentroAcopio;
+ 
+ public interface CentroAcopioRepository extends JpaRepository<CentroAcopio, Long> {
+ 
++    /**
++     * Devuelve los centros de acopio dentro de un radio (en km) de la
++     * coordenada dada, ordenados por distancia ascendente.
++     *
++     * CORRECCIÓN (Fase 3 / hallazgo Fase 2 "Radio de búsqueda inconsistente"):
++     * antes este query aplicaba LIMIT :limite (cantidad de centros, sin
++     * filtrar por distancia), lo que contradecía RF-07 ("centros dentro de
++     * 5 km"). Ahora filtra explícitamente por distancia <= :radioKm usando
++     * una subconsulta, porque las columnas calculadas (distancia_km) no se
++     * pueden referenciar directamente en un WHERE del mismo SELECT.
++     */
+     @Query(value = """
+-            SELECT
+-                id,
+-                nombre,
+-                direccion,
+-                latitud,
+-                longitud,
+-                telefono,
+-                horario,
+-                capacidad,
+-                (6371 * acos(
+-                    cos(radians(:lat)) * cos(radians(latitud)) *
+-                    cos(radians(longitud) - radians(:lng)) +
+-                    sin(radians(:lat)) * sin(radians(latitud))
+-                )) AS distancia_km
+-            FROM centro_acopio
++            SELECT * FROM (
++                SELECT
++                    id,
++                    nombre,
++                    direccion,
++                    latitud,
++                    longitud,
++                    telefono,
++                    horario,
++                    capacidad,
++                    (6371 * acos(
++                        cos(radians(:lat)) * cos(radians(latitud)) *
++                        cos(radians(longitud) - radians(:lng)) +
++                        sin(radians(:lat)) * sin(radians(latitud))
++                    )) AS distancia_km
++                FROM centro_acopio
++            ) sub
++            WHERE distancia_km <= :radioKm
+             ORDER BY distancia_km
+-            LIMIT :limite
+             """, nativeQuery = true)
+     List<Object[]> findCentrosCercanos(
+             @Param("lat") double lat,
+             @Param("lng") double lng,
+-            @Param("limite") int limite);
+-}
+\ No newline at end of file
++            @Param("radioKm") double radioKm);
++}
+diff --git a/backend/src/main/java/com/recycle/repository/TrazabilidadRepository.java b/backend/src/main/java/com/recycle/repository/TrazabilidadRepository.java
+index 246b31c..fd8a4d2 100644
+--- a/backend/src/main/java/com/recycle/repository/TrazabilidadRepository.java
++++ b/backend/src/main/java/com/recycle/repository/TrazabilidadRepository.java
+@@ -1,12 +1,27 @@
+ package com.recycle.repository;
+ 
+ import java.util.List;
++import java.util.Optional;
+ 
+-import org.springframework.data.jpa.repository.JpaRepository;
++import org.springframework.data.repository.Repository;
+ 
+ import com.recycle.entity.Residuo;
+ import com.recycle.entity.Trazabilidad;
+ 
+-public interface TrazabilidadRepository extends JpaRepository<Trazabilidad, Long> {
++/**
++ * RNF-05 (trazabilidad inmutable): a propósito NO extiende JpaRepository ni
++ * CrudRepository. Solo se declaran los métodos que el negocio necesita
++ * (crear y consultar). Como la interfaz nunca expone deleteById/delete/
++ * deleteAll ni un update explícito, no hay forma de borrar o reemplazar un
++ * registro de trazabilidad a través del repositorio: solo se puede insertar
++ * (save con un objeto sin id) y leer. Esto se refuerza además a nivel de
++ * base de datos con un trigger en database/schema.sql.
++ */
++public interface TrazabilidadRepository extends Repository<Trazabilidad, Long> {
++
++    Trazabilidad save(Trazabilidad trazabilidad);
++
++    Optional<Trazabilidad> findById(Long id);
++
+     List<Trazabilidad> findByResiduoOrderByFechaCambioAsc(Residuo residuo);
+-}
+\ No newline at end of file
++}
+diff --git a/backend/src/main/java/com/recycle/security/JwtUtil.java b/backend/src/main/java/com/recycle/security/JwtUtil.java
+index d9dfe7e..c1d2c91 100644
+--- a/backend/src/main/java/com/recycle/security/JwtUtil.java
++++ b/backend/src/main/java/com/recycle/security/JwtUtil.java
+@@ -15,7 +15,7 @@ import io.jsonwebtoken.security.Keys;
+ @Component
+ public class JwtUtil {
+ 
+-    @Value("${jwt.secret:miClaveSecretaSuperSegura1234567890}")
++    @Value("${jwt.secret:***REMOVED***}")
+     private String secret;
+ 
+     @Value("${jwt.expiration:86400000}")
+diff --git a/backend/src/main/java/com/recycle/service/CentroService.java b/backend/src/main/java/com/recycle/service/CentroService.java
+index d4b8e60..87f2fa7 100644
+--- a/backend/src/main/java/com/recycle/service/CentroService.java
++++ b/backend/src/main/java/com/recycle/service/CentroService.java
+@@ -17,8 +17,13 @@ public class CentroService {
+ 
+     private final CentroAcopioRepository centroAcopioRepository;
+ 
+-    public List<CentroCercanoResponse> getCentrosCercanos(double lat, double lng, int limite) {
+-        List<Object[]> resultados = centroAcopioRepository.findCentrosCercanos(lat, lng, limite);
++    /**
++     * RF-07: devuelve los centros de acopio dentro de un radio (km) de la
++     * coordenada dada. Antes 'limite' era una cantidad fija (LIMIT), lo que
++     * permitía devolver centros más allá de 5 km. Ahora es un radio real.
++     */
++    public List<CentroCercanoResponse> getCentrosCercanos(double lat, double lng, double radioKm) {
++        List<Object[]> resultados = centroAcopioRepository.findCentrosCercanos(lat, lng, radioKm);
+ 
+         return resultados.stream()
+                 .map(row -> CentroCercanoResponse.builder()
+@@ -53,4 +58,4 @@ public class CentroService {
+         }
+         return centroAcopioRepository.save(centro);
+     }
+-}
+\ No newline at end of file
++}
+diff --git a/backend/src/main/java/com/recycle/service/TrazabilidadService.java b/backend/src/main/java/com/recycle/service/TrazabilidadService.java
+index 07cd099..c21bab9 100644
+--- a/backend/src/main/java/com/recycle/service/TrazabilidadService.java
++++ b/backend/src/main/java/com/recycle/service/TrazabilidadService.java
+@@ -17,63 +17,43 @@ import lombok.RequiredArgsConstructor;
+ @RequiredArgsConstructor
+ public class TrazabilidadService {
+ 
+-        private final TrazabilidadRepository trazabilidadRepository;
+-        private final ResiduoRepository residuoRepository;
+-
+-        public List<Trazabilidad> getTrazabilidadByResiduo(@NonNull Long residuoId) {
+-                System.out.println("🔍 DEBUG: getTrazabilidadByResiduo llamado con ID: " + residuoId);
+-
+-                Residuo residuo = residuoRepository.findById(residuoId)
+-                                .orElseThrow(() -> new RuntimeException("Residuo no encontrado con id: " + residuoId));
+-
+-                List<Trazabilidad> resultado = trazabilidadRepository.findByResiduoOrderByFechaCambioAsc(residuo);
+-                System.out.println("🔍 DEBUG: getTrazabilidadByResiduo devuelve " + resultado.size() + " registros");
+-
+-                return resultado;
++    private final TrazabilidadRepository trazabilidadRepository;
++    private final ResiduoRepository residuoRepository;
++
++    public List<Trazabilidad> getTrazabilidadByResiduo(@NonNull Long residuoId) {
++        Residuo residuo = residuoRepository.findById(residuoId)
++                .orElseThrow(() -> new RuntimeException("Residuo no encontrado con id: " + residuoId));
++
++        return trazabilidadRepository.findByResiduoOrderByFechaCambioAsc(residuo);
++    }
++
++    /**
++     * Registra un cambio de estado como un nuevo evento de trazabilidad.
++     * RNF-05: siempre se construye un Trazabilidad SIN id (nuevo), nunca se
++     * reutiliza ni modifica un registro existente, para que quede como un
++     * historial de solo-inserción (append-only).
++     */
++    public Trazabilidad registrarCambioEstado(@NonNull Long residuoId, @NonNull String nuevoEstado,
++            @NonNull Usuario responsable, String observaciones) {
++
++        if (nuevoEstado.isEmpty()) {
++            throw new IllegalArgumentException("El nuevo estado no puede ser vacío");
+         }
+ 
+-        public Trazabilidad registrarCambioEstado(@NonNull Long residuoId, @NonNull String nuevoEstado,
+-                        Usuario responsable, String observaciones) {
+-
+-                System.out.println("🔍 DEBUG: registrarCambioEstado llamado con residuoId=" + residuoId
+-                                + ", nuevoEstado=" + nuevoEstado);
+-                System.out.println("🔍 DEBUG: responsable=" + (responsable != null ? responsable.getNombre() : "null")
+-                                + ", observaciones=" + observaciones);
+-
+-                if (nuevoEstado.isEmpty()) {
+-                        throw new IllegalArgumentException("El nuevo estado no puede ser vacío");
+-                }
+-
+-                Residuo residuo = residuoRepository.findById(residuoId)
+-                                .orElseThrow(() -> new RuntimeException("Residuo no encontrado con id: " + residuoId));
++        Residuo residuo = residuoRepository.findById(residuoId)
++                .orElseThrow(() -> new RuntimeException("Residuo no encontrado con id: " + residuoId));
+ 
+-                System.out.println("🔍 DEBUG: Residuo encontrado, estado actual=" + residuo.getEstado() + ", tipo="
+-                                + residuo.getTipo());
++        Trazabilidad trazabilidad = Trazabilidad.builder()
++                .residuo(residuo)
++                .estadoAnterior(residuo.getEstado())
++                .estadoNuevo(nuevoEstado)
++                .responsable(responsable)
++                .observaciones(observaciones)
++                .build();
+ 
+-                Trazabilidad trazabilidad = Trazabilidad.builder()
+-                                .residuo(residuo)
+-                                .estadoAnterior(residuo.getEstado())
+-                                .estadoNuevo(nuevoEstado)
+-                                .responsable(responsable)
+-                                .observaciones(observaciones)
+-                                .build();
++        residuo.setEstado(nuevoEstado);
++        residuoRepository.save(residuo);
+ 
+-                System.out.println("🔍 DEBUG: Trazabilidad creada: estadoAnterior=" + trazabilidad.getEstadoAnterior() +
+-                                ", estadoNuevo=" + trazabilidad.getEstadoNuevo());
+-
+-                residuo.setEstado(nuevoEstado);
+-                residuoRepository.save(residuo);
+-                System.out.println("🔍 DEBUG: Residuo actualizado en BD");
+-
+-                // Guardar trazabilidad
+-                Trazabilidad saved = trazabilidadRepository.save(trazabilidad);
+-                System.out.println("🔍 DEBUG: Trazabilidad guardada con ID: " + saved.getId());
+-
+-                return saved;
+-        }
+-
+-        public Trazabilidad guardarTrazabilidad(@NonNull Trazabilidad trazabilidad) {
+-                System.out.println("🔍 DEBUG: guardarTrazabilidad llamado");
+-                return trazabilidadRepository.save(trazabilidad);
+-        }
+-}
+\ No newline at end of file
++        return trazabilidadRepository.save(trazabilidad);
++    }
++}
+diff --git a/backend/src/main/resources/application.properties b/backend/src/main/resources/application.properties
+index 23a4cf1..18eccbf 100644
+--- a/backend/src/main/resources/application.properties
++++ b/backend/src/main/resources/application.properties
+@@ -10,10 +10,17 @@ server.port=8000
+ 
+ # ============================================================
+ # DATABASE (PostgreSQL)
+-# ============================================================
+-spring.datasource.url=jdbc:postgresql://localhost:5432/recycle_db
+-spring.datasource.username=admin
+-spring.datasource.password=secret
++# ------------------------------------------------------------
++# CORRECCIÓN (hallazgo Fase 2 "Seguridad de evidencias"): usuario y
++# contraseña ya NO están fijos en este archivo versionado. Se leen de
++# variables de entorno; los valores tras ":" son SOLO un fallback para
++# levantar el entorno de demo local (docker-compose) y deben cambiarse en
++# cualquier entorno real. El valor "secret" que estuvo hardcodeado aquí
++# debe considerarse comprometido y rotarse en la base de datos real.
++# ============================================================
++spring.datasource.url=${DB_URL:jdbc:postgresql://localhost:5432/recycle_db}
++spring.datasource.username=${DB_USERNAME:admin}
++spring.datasource.password=${DB_PASSWORD:***REMOVED***}
+ spring.datasource.driver-class-name=org.postgresql.Driver
+ 
+ # ============================================================
+@@ -27,6 +34,10 @@ spring.jpa.defer-datasource-initialization=true
+ 
+ # ============================================================
+ # FLYWAY (Migraciones) - Deshabilitar
++# ------------------------------------------------------------
++# database/schema.sql contiene el DDL versionado y reproducible (ver README).
++# Se recomienda migrar a Flyway en una fase futura para no depender de
++# hibernate.ddl-auto=update en un entorno productivo.
+ # ============================================================
+ spring.flyway.enabled=false
+ 
+@@ -37,9 +48,14 @@ spring.thymeleaf.check-template-location=false
+ 
+ # ============================================================
+ # JWT (Configuración)
+-# ============================================================
+-jwt.secret=miClaveSecretaSuperSegura1234567890
+-jwt.expiration=86400000
++# ------------------------------------------------------------
++# CORRECCIÓN: la clave de firma ya no queda fija en el archivo versionado.
++# El valor de fallback es SOLO para demo local; la clave anterior
++# ("miClaveSecretaSuperSegura1234567890") quedó expuesta en el historial de
++# git y debe tratarse como comprometida (rotarla en cualquier despliegue real).
++# ============================================================
++jwt.secret=${JWT_SECRET:***REMOVED***}
++jwt.expiration=${JWT_EXPIRATION:86400000}
+ 
+ # ============================================================
+ # SWAGGER / OPENAPI (Configuración completa)
+@@ -56,4 +72,4 @@ springdoc.swagger-ui.operations-sorter=method
+ # SQL INIT - Cargar datos iniciales
+ # ============================================================
+ spring.sql.init.mode=always
+-spring.sql.init.platform=postgresql 
+\ No newline at end of file
++spring.sql.init.platform=postgresql
+diff --git a/database/schema.sql b/database/schema.sql
+new file mode 100644
+index 0000000..86f1096
+--- /dev/null
++++ b/database/schema.sql
+@@ -0,0 +1,132 @@
++-- ============================================================
++-- Re-Cycle Tech — DDL versionado (Fase 3)
++-- ============================================================
++-- CORRECCIÓN del hallazgo de Fase 2 "DDL con índices no ejecutables":
++-- el script anterior definía índices sobre residuoId y usuarioId(email),
++-- pero las columnas reales (generadas por las entidades JPA) son
++-- residuo_id y email. Este archivo usa los nombres de columna reales y
++-- se puede ejecutar desde una base vacía sin errores.
++--
++-- Uso (instalación limpia y reproducible):
++--   docker-compose up -d postgres
++--   psql "postgresql://admin:<password>@localhost:5432/recycle_db" -f database/schema.sql
++--
++-- Nota: en desarrollo, Hibernate (spring.jpa.hibernate.ddl-auto=update)
++-- también puede crear/actualizar estas tablas automáticamente al levantar
++-- el backend. Este archivo es la referencia versionada y reproducible del
++-- esquema para auditoría, evaluación y despliegues futuros con Flyway.
++-- ============================================================
++
++BEGIN;
++
++-- ============================================================
++-- USUARIO
++-- ============================================================
++CREATE TABLE IF NOT EXISTS usuario (
++    id              BIGSERIAL PRIMARY KEY,
++    nombre          VARCHAR(100) NOT NULL,
++    email           VARCHAR(100) NOT NULL,
++    password        VARCHAR(255) NOT NULL,
++    rol             VARCHAR(30)  NOT NULL DEFAULT 'CIUDADANO',
++    fecha_registro  TIMESTAMP,
++    CONSTRAINT uq_usuario_email UNIQUE (email)
++);
++
++-- Índice explícito de apoyo a login/lookup por email (además del UNIQUE).
++-- Nombre corregido respecto al hallazgo de Fase 2: usuarioId(email) -> email.
++CREATE INDEX IF NOT EXISTS idx_usuario_email ON usuario (email);
++
++-- ============================================================
++-- CENTRO_ACOPIO
++-- ============================================================
++CREATE TABLE IF NOT EXISTS centro_acopio (
++    id          BIGSERIAL PRIMARY KEY,
++    nombre      VARCHAR(150) NOT NULL,
++    direccion   TEXT NOT NULL,
++    latitud     DOUBLE PRECISION NOT NULL,
++    longitud    DOUBLE PRECISION NOT NULL,
++    telefono    VARCHAR(20),
++    horario     VARCHAR(100),
++    capacidad   VARCHAR(50)
++);
++
++CREATE INDEX IF NOT EXISTS idx_centro_acopio_lat_lng ON centro_acopio (latitud, longitud);
++
++-- ============================================================
++-- RESIDUO
++-- ============================================================
++CREATE TABLE IF NOT EXISTS residuo (
++    id              BIGSERIAL PRIMARY KEY,
++    usuario_id      BIGINT NOT NULL REFERENCES usuario (id),
++    centro_id       BIGINT REFERENCES centro_acopio (id),
++    tipo            VARCHAR(50) NOT NULL,
++    descripcion     TEXT,
++    latitud         DOUBLE PRECISION,
++    longitud        DOUBLE PRECISION,
++    estado          VARCHAR(30) NOT NULL DEFAULT 'REGISTRADO',
++    fecha_registro  TIMESTAMP,
++    CONSTRAINT chk_residuo_estado CHECK (estado IN (
++        'REGISTRADO', 'PENDIENTE_ENTREGA', 'RECIBIDO_EN_CENTRO', 'CLASIFICADO',
++        'DONADO', 'RECICLADO', 'REACONDICIONADO', 'DESTRUCCION_SEGURA'
++    ))
++);
++
++CREATE INDEX IF NOT EXISTS idx_residuo_usuario ON residuo (usuario_id);
++CREATE INDEX IF NOT EXISTS idx_residuo_estado  ON residuo (estado);
++
++-- ============================================================
++-- TRAZABILIDAD
++-- ============================================================
++CREATE TABLE IF NOT EXISTS trazabilidad (
++    id              BIGSERIAL PRIMARY KEY,
++    residuo_id      BIGINT NOT NULL REFERENCES residuo (id),
++    estado_anterior VARCHAR(30),
++    estado_nuevo    VARCHAR(30) NOT NULL,
++    responsable_id  BIGINT REFERENCES usuario (id),
++    observaciones   TEXT,
++    fecha_cambio    TIMESTAMP
++);
++
++-- Índice explícito, corregido respecto al hallazgo de Fase 2:
++-- antes idx_trazabilidad_residuo(residuoId) -> ahora (residuo_id).
++CREATE INDEX IF NOT EXISTS idx_trazabilidad_residuo ON trazabilidad (residuo_id);
++CREATE INDEX IF NOT EXISTS idx_trazabilidad_fecha    ON trazabilidad (fecha_cambio);
++
++-- ============================================================
++-- RNF-05: TRAZABILIDAD INMUTABLE (refuerzo a nivel de base de datos)
++-- ------------------------------------------------------------
++-- La aplicación ya no expone update/delete para trazabilidad
++-- (TrazabilidadRepository solo declara save/findById/findByResiduo...).
++-- Este trigger es una segunda capa de defensa: aunque alguien se conecte
++-- directo a la base de datos con permisos de escritura, no podrá
++-- modificar ni borrar un evento de trazabilidad ya insertado.
++-- ============================================================
++CREATE OR REPLACE FUNCTION fn_trazabilidad_inmutable()
++RETURNS TRIGGER AS $$
++BEGIN
++    RAISE EXCEPTION
++        'trazabilidad es de solo inserción (RNF-05): % no permitido sobre id=%',
++        TG_OP, OLD.id;
++END;
++$$ LANGUAGE plpgsql;
++
++DROP TRIGGER IF EXISTS trg_trazabilidad_no_update ON trazabilidad;
++CREATE TRIGGER trg_trazabilidad_no_update
++    BEFORE UPDATE ON trazabilidad
++    FOR EACH ROW EXECUTE FUNCTION fn_trazabilidad_inmutable();
++
++DROP TRIGGER IF EXISTS trg_trazabilidad_no_delete ON trazabilidad;
++CREATE TRIGGER trg_trazabilidad_no_delete
++    BEFORE DELETE ON trazabilidad
++    FOR EACH ROW EXECUTE FUNCTION fn_trazabilidad_inmutable();
++
++COMMIT;
++
++-- ============================================================
++-- PRUEBA DE INMUTABILIDAD (evidencia para Fase 3, ejecutar aparte)
++-- ============================================================
++-- UPDATE trazabilidad SET observaciones = 'intento no autorizado' WHERE id = 1;
++-- Resultado esperado: ERROR: trazabilidad es de solo inserción (RNF-05)...
++--
++-- DELETE FROM trazabilidad WHERE id = 1;
++-- Resultado esperado: ERROR: trazabilidad es de solo inserción (RNF-05)...
+diff --git a/docker-compose.yml b/docker-compose.yml
+index 987a9c7..f35ff2d 100644
+--- a/docker-compose.yml
++++ b/docker-compose.yml
+@@ -5,18 +5,18 @@ services:
+     image: postgres:15
+     container_name: recycle-db
+     environment:
+-      POSTGRES_DB: recycle_db
+-      POSTGRES_USER: admin
+-      POSTGRES_PASSWORD: secret
++      POSTGRES_DB: ${DB_NAME:-recycle_db}
++      POSTGRES_USER: ${DB_USERNAME:-admin}
++      POSTGRES_PASSWORD: ${DB_PASSWORD:-***REMOVED***}
+     ports:
+       - "5432:5432"
+     volumes:
+       - postgres_data:/var/lib/postgresql/data
+     healthcheck:
+-      test: ["CMD-SHELL", "pg_isready -U admin"]
++      test: ["CMD-SHELL", "pg_isready -U ${DB_USERNAME:-admin}"]
+       interval: 10s
+       timeout: 5s
+       retries: 5
+ 
+ volumes:
+-  postgres_data: 
+\ No newline at end of file
++  postgres_data:

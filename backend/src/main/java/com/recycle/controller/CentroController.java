@@ -3,6 +3,7 @@ package com.recycle.controller;
 import java.util.List;
 
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -24,13 +25,17 @@ public class CentroController {
 
     private final CentroService centroService;
 
+    /**
+     * RF-07: parámetro renombrado de 'limite' (cantidad) a 'radioKm' (radio
+     * real en kilómetros), por defecto 5 km según el criterio de aceptación.
+     */
     @GetMapping("/cercanos")
     public ResponseEntity<List<CentroCercanoResponse>> getCentrosCercanos(
             @RequestParam double lat,
             @RequestParam double lng,
-            @RequestParam(defaultValue = "5") int limite) {
+            @RequestParam(defaultValue = "5") double radioKm) {
 
-        List<CentroCercanoResponse> centros = centroService.getCentrosCercanos(lat, lng, limite);
+        List<CentroCercanoResponse> centros = centroService.getCentrosCercanos(lat, lng, radioKm);
         return ResponseEntity.ok(centros);
     }
 
@@ -44,7 +49,12 @@ public class CentroController {
         return ResponseEntity.ok(centroService.getCentroById(id));
     }
 
+    // RF-11: antes este endpoint no tenía ninguna restricción de acceso
+    // (heredaba /api/centros/** permitAll de SecurityConfig), por lo que
+    // cualquier persona sin autenticarse podía crear centros de acopio.
+    // Ahora exige rol ADMIN (ver SecurityConfig y @PreAuthorize).
     @PostMapping
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<CentroAcopio> crearCentro(@RequestBody CentroAcopio centro) {
         return ResponseEntity.ok(centroService.crearCentro(centro));
     }
