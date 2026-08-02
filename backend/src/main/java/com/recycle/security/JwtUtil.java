@@ -15,7 +15,7 @@ import io.jsonwebtoken.security.Keys;
 @Component
 public class JwtUtil {
 
-    @Value("${jwt.secret:miClaveSecretaSuperSegura1234567890}")
+    @Value("${jwt.secret:CAMBIA_ESTA_CLAVE_SOLO_PARA_DEMO_LOCAL_1234567890}")
     private String secret;
 
     @Value("${jwt.expiration:86400000}")
