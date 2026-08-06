@@ -5,18 +5,18 @@ services:
     image: postgres:15
     container_name: recycle-db
     environment:
-      POSTGRES_DB: recycle_db
-      POSTGRES_USER: admin
-      POSTGRES_PASSWORD: secret
+      POSTGRES_DB: ${DB_NAME:-recycle_db}
+      POSTGRES_USER: ${DB_USERNAME:-admin}
+      POSTGRES_PASSWORD: ${DB_PASSWORD:-***REMOVED***}
     ports:
       - "5432:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U admin"]
+      test: ["CMD-SHELL", "pg_isready -U ${DB_USERNAME:-admin}"]
       interval: 10s
       timeout: 5s
       retries: 5
 
 volumes:
-  postgres_data: 
+  postgres_data:
