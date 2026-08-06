@@ -17,8 +17,13 @@ public class CentroService {
 
     private final CentroAcopioRepository centroAcopioRepository;
 
-    public List<CentroCercanoResponse> getCentrosCercanos(double lat, double lng, int limite) {
-        List<Object[]> resultados = centroAcopioRepository.findCentrosCercanos(lat, lng, limite);
+    /**
+     * RF-07: devuelve los centros de acopio dentro de un radio (km) de la
+     * coordenada dada. Antes 'limite' era una cantidad fija (LIMIT), lo que
+     * permitía devolver centros más allá de 5 km. Ahora es un radio real.
+     */
+    public List<CentroCercanoResponse> getCentrosCercanos(double lat, double lng, double radioKm) {
+        List<Object[]> resultados = centroAcopioRepository.findCentrosCercanos(lat, lng, radioKm);
 
         return resultados.stream()
                 .map(row -> CentroCercanoResponse.builder()

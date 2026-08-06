@@ -4,6 +4,7 @@ import java.util.Arrays;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -48,11 +49,33 @@ public class SecurityConfig {
                         // Auth y Test
                         .requestMatchers("/api/auth/**").permitAll()
                         .requestMatchers("/api/test/**").permitAll()
-                        // Centros de acopio (públicos para consulta)
-                        .requestMatchers("/api/centros/**").permitAll()
-                        // ===== ENDPOINTS PROTEGIDOS =====
+
+                        // ===== CENTROS DE ACOPIO =====
+                        // Consulta pública (RF-07/RF-11 lectura), pero crear
+                        // centros ya NO es público: antes /api/centros/**
+                        // permitAll cubría también el POST, así que cualquiera
+                        // sin sesión podía dar de alta centros falsos.
+                        .requestMatchers(HttpMethod.GET, "/api/centros/**").permitAll()
+                        .requestMatchers(HttpMethod.POST, "/api/centros").hasRole("ADMIN")
+
+                        // ===== RESIDUOS =====
+                        // Antes solo exigían .authenticated() a nivel de
+                        // /api/residuos/**, así que cualquier CIUDADANO podía
+                        // ver /todos o cambiar el estado de cualquier residuo.
+                        .requestMatchers(HttpMethod.GET, "/api/residuos/todos")
+                        .hasAnyRole("OPERADOR_CENTRO", "OPERADOR_TECNICO", "ADMIN")
+                        .requestMatchers(HttpMethod.PUT, "/api/residuos/*/estado")
+                        .hasAnyRole("OPERADOR_CENTRO", "OPERADOR_TECNICO", "ADMIN")
                         .requestMatchers("/api/residuos/**").authenticated()
-                        .requestMatchers("/api/trazabilidad/**").authenticated()
+
+                        // ===== TRAZABILIDAD =====
+                        // Consultar el historial: cualquier usuario autenticado
+                        // (el ciudadano dueño del residuo, operadores, admin).
+                        // Cambiar el estado: solo operadores/admin (RF-06/PT07).
+                        .requestMatchers(HttpMethod.PUT, "/api/trazabilidad/*/estado")
+                        .hasAnyRole("OPERADOR_CENTRO", "OPERADOR_TECNICO", "ADMIN")
+                        .requestMatchers(HttpMethod.GET, "/api/trazabilidad/**").authenticated()
+
                         // ===== ENDPOINTS SOLO ADMIN =====
                         .requestMatchers("/api/admin/**").hasRole("ADMIN")
                         .anyRequest().authenticated())

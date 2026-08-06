@@ -20,8 +20,10 @@ import com.recycle.dto.ResiduoRequest;
 import com.recycle.dto.ResiduoResponse;
 import com.recycle.entity.Residuo;
 import com.recycle.entity.Usuario;
+import com.recycle.entity.Trazabilidad;
 import com.recycle.security.JwtUtil;
 import com.recycle.service.ResiduoService;
+import com.recycle.service.TrazabilidadService;
 import com.recycle.service.UsuarioService;
 
 import jakarta.validation.Valid;
@@ -34,6 +36,7 @@ public class ResiduoController {
 
     private final ResiduoService residuoService;
     private final UsuarioService usuarioService;
+    private final TrazabilidadService trazabilidadService;
     private final JwtUtil jwtUtil;
 
     @PostMapping
@@ -117,15 +120,32 @@ public class ResiduoController {
         return ResponseEntity.ok(response);
     }
 
+    // CORRECCIÓN: este endpoint llamaba directamente a
+    // ResiduoService.actualizarEstado(), lo que cambiaba el estado del
+    // residuo SIN dejar ningún registro en trazabilidad (rompía RNF-05,
+    // porque existía una vía de cambio de estado sin auditoría). Ahora
+    // delega en TrazabilidadService, igual que TrazabilidadController, para
+    // que todo cambio de estado quede en el historial inmutable atribuido
+    // al usuario autenticado. El control de rol (solo operadores/admin) se
+    // aplica en SecurityConfig.
     @PutMapping("/{id}/estado")
     public ResponseEntity<?> actualizarEstado(
+            @RequestHeader("Authorization") String authHeader,
             @PathVariable Long id,
-            @RequestParam String nuevoEstado) {
+            @RequestParam String nuevoEstado,
+            @RequestParam(required = false) String observaciones) {
         try {
-            Residuo residuo = residuoService.actualizarEstado(id, nuevoEstado);
+            String token = authHeader.substring(7);
+            Long usuarioId = jwtUtil.extractUsuarioId(token);
+            Usuario responsable = usuarioService.findById(usuarioId)
+                    .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
+
+            Trazabilidad trazabilidad = trazabilidadService.registrarCambioEstado(
+                    id, nuevoEstado, responsable, observaciones);
+
             return ResponseEntity.ok(Map.of(
                     "mensaje", "Estado actualizado",
-                    "nuevoEstado", residuo.getEstado()));
+                    "nuevoEstado", trazabilidad.getEstadoNuevo()));
         } catch (Exception e) {
             return ResponseEntity.badRequest().body(Map.of("error", e.getMessage()));
         }
