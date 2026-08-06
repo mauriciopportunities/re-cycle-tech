@@ -1,0 +1,148 @@
+/* ===== MAPA - ESTILOS ===== */
+
+.mapa-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 20px;
+  font-family: 'Segoe UI', Arial, sans-serif;
+}
+
+.mapa-container h2 {
+  color: #0f2b3d;
+  font-size: 28px;
+  margin-bottom: 8px;
+}
+
+.info-ubicacion {
+  font-size: 14px;
+  color: #2980b9;
+  background: #eaf2f8;
+  padding: 8px 16px;
+  border-radius: 8px;
+  display: inline-block;
+  margin-bottom: 8px;
+  border: 1px solid #b0d4e3;
+}
+
+.mapa-enlace-container {
+  text-align: center;
+  margin: 20px 0;
+}
+
+.btn-maps-enlace {
+  display: inline-block;
+  padding: 14px 32px;
+  background: linear-gradient(135deg, #4285f4, #34a853);
+  color: white;
+  border-radius: 50px;
+  text-decoration: none;
+  font-weight: 700;
+  font-size: 16px;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 15px rgba(66, 133, 244, 0.3);
+}
+
+.btn-maps-enlace:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 8px 25px rgba(66, 133, 244, 0.4);
+}
+
+.info-enlace {
+  font-size: 13px;
+  color: #5d6d7e;
+  margin-top: 6px;
+}
+
+.lista-centros {
+  list-style: none;
+  padding: 0;
+  margin: 16px 0;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 12px;
+}
+
+.lista-centros li {
+  background: #f8f9fa;
+  padding: 14px 16px;
+  border-radius: 8px;
+  border-left: 4px solid #2ecc71;
+  text-align: left;
+  transition: all 0.3s ease;
+}
+
+.lista-centros li:hover {
+  background: #eafaf1;
+  transform: translateX(4px);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+}
+
+.lista-centros li strong {
+  color: #0f2b3d;
+  font-size: 15px;
+}
+
+.lista-centros li small {
+  color: #2d4b5e;
+  font-size: 13px;
+  display: block;
+  margin-top: 4px;
+  line-height: 1.6;
+}
+
+.coordenadas {
+  font-size: 12px;
+  color: #7f8c8d;
+  display: block;
+  margin: 2px 0;
+}
+
+.btn-ver-mapa {
+  display: inline-block;
+  margin-top: 4px;
+  padding: 4px 12px;
+  background: #4285f4;
+  color: white;
+  border-radius: 4px;
+  text-decoration: none;
+  font-size: 12px;
+  font-weight: 600;
+  transition: background 0.3s;
+}
+
+.btn-ver-mapa:hover {
+  background: #3367d6;
+}
+
+.mensaje-ambiental-mapa {
+  margin-top: 20px;
+  padding: 14px 20px;
+  background: linear-gradient(135deg, #eafaf1 0%, #d5f5e3 100%);
+  border-radius: 12px;
+  border-left: 4px solid #2ecc71;
+  font-size: 14px;
+  color: #1a5276;
+}
+
+@media (max-width: 768px) {
+  .mapa-container {
+    padding: 12px;
+  }
+
+  .mapa-container h2 {
+    font-size: 22px;
+  }
+
+  .lista-centros {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 480px) {
+  .btn-maps-enlace {
+    width: 100%;
+    text-align: center;
+    padding: 12px 16px;
+    font-size: 14px;
+  }
+} 

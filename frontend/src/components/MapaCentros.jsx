@@ -1,150 +1,105 @@
-import { GoogleMap, InfoWindow, LoadScript, Marker } from '@react-google-maps/api';
 import axios from 'axios';
 import { useEffect, useState } from 'react';
-
-const containerStyle = {
-  width: '100%',
-  height: '500px'
-};
-
-// Coordenadas de Urbanización Las Orquideas (ubicación por defecto)
-const UBICACION_DEFAULT = {
-  lat: 13.791660737396686,
-  lng: -89.17922954299647
-};
+import './MapaCentros.css';
 
 const MapaCentros = () => {
-  const [ubicacion, setUbicacion] = useState(UBICACION_DEFAULT);
   const [centros, setCentros] = useState([]);
   const [cargando, setCargando] = useState(true);
   const [error, setError] = useState(null);
-  const [selected, setSelected] = useState(null);
-  const [mostrarInfoUsuario, setMostrarInfoUsuario] = useState(false);
 
-  // Obtener ubicación del usuario (si permite geolocalización)
-  useEffect(() => {
-    if (navigator.geolocation) {
-      navigator.geolocation.getCurrentPosition(
-        (position) => {
-          setUbicacion({
-            lat: position.coords.latitude,
-            lng: position.coords.longitude
-          });
-        },
-        () => {
-          console.log('Usando ubicación por defecto: Urbanización Las Orquideas');
-          // Mantener la ubicación por defecto
-        }
-      );
-    }
-  }, []);
+  const lat = 13.791660737396686;
+  const lng = -89.17922954299647;
 
-  // Consultar centros cercanos
   useEffect(() => {
     const fetchCentros = async () => {
       try {
         setCargando(true);
         const response = await axios.get(
-          `http://localhost:8000/api/centros/cercanos?lat=${ubicacion.lat}&lng=${ubicacion.lng}&limite=5`
+          `http://localhost:8000/api/centros/cercanos?lat=${lat}&lng=${lng}&limite=10`
         );
         setCentros(response.data);
         setError(null);
       } catch (err) {
+        console.error('Error al cargar centros:', err);
         setError('Error al cargar los centros');
-        console.error(err);
       } finally {
         setCargando(false);
       }
     };
 
     fetchCentros();
-  }, [ubicacion]);
+  }, [lat, lng]);
 
-  if (cargando) return <div className="cargando">Cargando centros cercanos...</div>;
-  if (error) return <div className="error">{error}</div>;
+  const searchUrl = `https://www.google.com/maps/search/centros+de+acopio/@${lat},${lng},13z`;
+
+  if (cargando) {
+    return <div className="cargando">⏳ Cargando centros de acopio...</div>;
+  }
+
+  if (error) {
+    return <div className="error">{error}</div>;
+  }
 
   return (
-    <LoadScript googleMapsApiKey={import.meta.env.VITE_GOOGLE_MAPS_API_KEY}>
-      <div className="mapa-container">
-        <h2>📍 Centros de Acopio Cercanos</h2>
-        <p className="info-ubicacion">
-          📌 Tu ubicación: {ubicacion.lat.toFixed(6)}, {ubicacion.lng.toFixed(6)}
-        </p>
-        <p className="info-radio">Mostrando los {centros.length} centros más cercanos a tu ubicación</p>
+    <div className="mapa-container">
+      <h2>📍 Centros de Acopio Cercanos</h2>
+      <p className="info-ubicacion">
+        📌 Tu ubicación: {lat.toFixed(6)}, {lng.toFixed(6)}
+      </p>
 
-        <GoogleMap
-          mapContainerStyle={containerStyle}
-          center={ubicacion}
-          zoom={14}
+      <div className="mapa-enlace-container">
+        <a 
+          href={searchUrl} 
+          target="_blank" 
+          rel="noopener noreferrer"
+          className="btn-maps-enlace"
         >
-          {/* Marcador de ubicación del usuario (azul) con InfoWindow */}
-          <Marker
-            position={ubicacion}
-            icon={{
-              url: 'http://maps.google.com/mapfiles/ms/icons/blue-dot.png'
-            }}
-            onClick={() => setMostrarInfoUsuario(!mostrarInfoUsuario)}
-          />
+          🗺️ Buscar centros de acopio cerca de ti
+        </a>
+        <p className="info-enlace">
+          Haz clic para ver todos los centros de acopio en Google Maps.
+        </p>
+      </div>
 
-          {/* InfoWindow para el marcador azul */}
-          {mostrarInfoUsuario && (
-            <InfoWindow
-              position={ubicacion}
-              onCloseClick={() => setMostrarInfoUsuario(false)}
-            >
-              <div className="info-window-usuario">
-                <h3>📍 Tu ubicación</h3>
-                <p><strong>Latitud:</strong> {ubicacion.lat.toFixed(8)}</p>
-                <p><strong>Longitud:</strong> {ubicacion.lng.toFixed(8)}</p>
-                <p className="ubicacion-referencia">🏠 Urbanización Las Orquideas</p>
-                <p className="ubicacion-pais">🇸🇻 El Salvador</p>
-              </div>
-            </InfoWindow>
-          )}
-
-          {/* Marcadores de centros de acopio (rojos) */}
-          {centros.map((centro) => (
-            <Marker
-              key={centro.id}
-              position={{
-                lat: centro.latitud,
-                lng: centro.longitud
-              }}
-              title={centro.nombre}
-              onClick={() => setSelected(centro)}
-            />
-          ))}
-
-          {/* InfoWindow para los centros de acopio */}
-          {selected && (
-            <InfoWindow
-              position={{ lat: selected.latitud, lng: selected.longitud }}
-              onCloseClick={() => setSelected(null)}
-            >
-              <div className="info-window-centro">
-                <h3>{selected.nombre}</h3>
-                <p>{selected.direccion}</p>
-                <p><strong>📏 {selected.distanciaKm.toFixed(2)} km</strong></p>
-                <p>📞 {selected.telefono}</p>
-                <p>🕐 {selected.horario}</p>
-                <p>📦 Capacidad: {selected.capacidad}</p>
-              </div>
-            </InfoWindow>
-          )}
-        </GoogleMap>
-
+      {centros.length === 0 ? (
+        <p className="sin-centros">No hay centros de acopio cercanos.</p>
+      ) : (
         <ul className="lista-centros">
           {centros.map((centro) => (
             <li key={centro.id}>
-              <strong>{centro.nombre}</strong> - {centro.distanciaKm.toFixed(2)} km
+              <strong>{centro.nombre}</strong>
               <br />
-              <small>{centro.direccion}</small>
+              <small>
+                📍 {centro.direccion}
+                <br />
+                📞 {centro.telefono || 'No disponible'}
+                <br />
+                🕐 {centro.horario || 'No disponible'}
+                <br />
+                <span className="coordenadas">
+                  📌 {centro.latitud.toFixed(6)}, {centro.longitud.toFixed(6)}
+                </span>
+                <br />
+                {/* ✅ Enlace con place para Google Maps */}
+                <a 
+                  href={`https://www.google.com/maps/place/${centro.latitud},${centro.longitud}/@${centro.latitud},${centro.longitud},17z`} 
+                  target="_blank" 
+                  rel="noopener noreferrer"
+                  className="btn-ver-mapa"
+                >
+                  Ver en mapa
+                </a>
+              </small>
             </li>
           ))}
         </ul>
+      )}
+
+      <div className="mensaje-ambiental-mapa">
+        <p>🌱 <strong>Recuerda:</strong> Cada dispositivo electrónico reciclado ayuda a reducir la contaminación por metales pesados y plásticos no biodegradables.</p>
       </div>
-    </LoadScript>
+    </div>
   );
 };
 
-export default MapaCentros; 
+export default MapaCentros;
