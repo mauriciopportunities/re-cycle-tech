@@ -55,8 +55,12 @@ public class SecurityConfig {
                         // centros ya NO es público: antes /api/centros/**
                         // permitAll cubría también el POST, así que cualquiera
                         // sin sesión podía dar de alta centros falsos.
+                        // CORRECCIÓN FASE 4: Añadidos PUT y DELETE con rol ADMIN
+                        // para completar el CRUD de centros.
                         .requestMatchers(HttpMethod.GET, "/api/centros/**").permitAll()
                         .requestMatchers(HttpMethod.POST, "/api/centros").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.PUT, "/api/centros/**").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.DELETE, "/api/centros/**").hasRole("ADMIN")
 
                         // ===== RESIDUOS =====
                         // Antes solo exigían .authenticated() a nivel de
