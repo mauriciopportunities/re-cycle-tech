@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.recycle.dto.CentroCercanoResponse;
 import com.recycle.entity.CentroAcopio;
@@ -19,12 +20,7 @@ public class CentroService {
 
     /**
      * RF-07: devuelve los centros de acopio dentro de un radio (km) de la
-     * coordenada dada. Antes 'limite' era una cantidad fija (LIMIT), lo que
-     * permitía devolver centros más allá de 5 km. Ahora es un radio real.
-     * 
-     * CORRECCIÓN FASE 4: Añadidas validaciones de radio y coordenadas para
-     * cumplir con las pruebas automatizadas (radioKm > 0, latitud entre -90
-     * y 90, longitud entre -180 y 180).
+     * coordenada dada.
      */
     public List<CentroCercanoResponse> getCentrosCercanos(double lat, double lng, double radioKm) {
         // Validar radio
@@ -64,19 +60,63 @@ public class CentroService {
                 .orElseThrow(() -> new RuntimeException("Centro no encontrado con id: " + id));
     }
 
+    // ============ CRUD COMPLETO (FASE 4) ============
+
+    @Transactional
     public CentroAcopio crearCentro(CentroAcopio centro) {
-        if (centro == null) {
-            throw new IllegalArgumentException("El centro no puede ser null");
-        }
+        validarCentro(centro);
         return centroAcopioRepository.save(centro);
     }
 
-    /**
-     * Valida que las coordenadas estén dentro de los rangos válidos.
-     * Latitud: -90 a 90
-     * Longitud: -180 a 180
-     */
-    private void validarCoordenadas(double latitud, double longitud) {
+    @Transactional
+    public CentroAcopio actualizarCentro(Long id, CentroAcopio centroActualizado) {
+        CentroAcopio centroExistente = getCentroById(id);
+        validarCentro(centroActualizado);
+
+        centroExistente.setNombre(centroActualizado.getNombre());
+        centroExistente.setDireccion(centroActualizado.getDireccion());
+        centroExistente.setLatitud(centroActualizado.getLatitud());
+        centroExistente.setLongitud(centroActualizado.getLongitud());
+        centroExistente.setTelefono(centroActualizado.getTelefono());
+        centroExistente.setHorario(centroActualizado.getHorario());
+        centroExistente.setCapacidad(centroActualizado.getCapacidad());
+
+        return centroAcopioRepository.save(centroExistente);
+    }
+
+    @Transactional
+    public void eliminarCentro(Long id) {
+        CentroAcopio centro = getCentroById(id);
+
+        // Verificar que no tenga residuos asociados
+        if (centro.getResiduos() != null && !centro.getResiduos().isEmpty()) {
+            throw new IllegalStateException(
+                    "No se puede eliminar el centro porque tiene residuos asociados. " +
+                            "Reasigne los residuos antes de eliminar.");
+        }
+
+        centroAcopioRepository.deleteById(id);
+    }
+
+    // ============ VALIDACIONES ============
+
+    private void validarCentro(CentroAcopio centro) {
+        if (centro == null) {
+            throw new IllegalArgumentException("El centro no puede ser null");
+        }
+        if (centro.getNombre() == null || centro.getNombre().trim().isEmpty()) {
+            throw new IllegalArgumentException("El nombre del centro es obligatorio");
+        }
+        if (centro.getDireccion() == null || centro.getDireccion().trim().isEmpty()) {
+            throw new IllegalArgumentException("La dirección del centro es obligatoria");
+        }
+        validarCoordenadas(centro.getLatitud(), centro.getLongitud());
+    }
+
+    private void validarCoordenadas(Double latitud, Double longitud) {
+        if (latitud == null || longitud == null) {
+            throw new IllegalArgumentException("Latitud y longitud son obligatorias");
+        }
         if (latitud < -90 || latitud > 90) {
             throw new IllegalArgumentException("Latitud debe estar entre -90 y 90");
         }
