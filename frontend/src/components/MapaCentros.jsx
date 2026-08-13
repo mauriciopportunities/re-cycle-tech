@@ -1,44 +1,21 @@
-import axios from 'axios';
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import './MapaCentros.css';
 
 const MapaCentros = () => {
-  const [centros, setCentros] = useState([]);
-  const [cargando, setCargando] = useState(true);
-  const [error, setError] = useState(null);
+  const [cargando, setCargando] = useState(false);
 
   const lat = 13.791660737396686;
   const lng = -89.17922954299647;
 
-  useEffect(() => {
-    const fetchCentros = async () => {
-      try {
-        setCargando(true);
-        const response = await axios.get(
-          `http://localhost:8000/api/centros/cercanos?lat=${lat}&lng=${lng}&limite=10`
-        );
-        setCentros(response.data);
-        setError(null);
-      } catch (err) {
-        console.error('Error al cargar centros:', err);
-        setError('Error al cargar los centros');
-      } finally {
-        setCargando(false);
-      }
-    };
-
-    fetchCentros();
-  }, [lat, lng]);
+  // ✅ Datos locales (sin depender del backend)
+  const centros = [
+    { id: 3, nombre: 'ZARTEX - Gestor Autorizado', direccion: 'Calle Agua Caliente Km 5, Soyapango', latitud: 13.70533385, longitud: -89.15557049, telefono: '503-1234-5678', horario: 'Lun-Vie 8:00-17:00' },
+    { id: 4, nombre: 'AUTOCONSA - Gestor Autorizado', direccion: '37 Ave. Sur #543, Col. Flor Blanca, San Salvador', latitud: 13.69701430, longitud: -89.21070491, telefono: '503-1234-5679', horario: 'Lun-Vie 8:00-17:00' },
+    { id: 2, nombre: 'SRS - Superintendencia de Regulación Sanitaria', direccion: '75 Av. Sur #214, Col. Escalón, San Salvador', latitud: 13.70113358, longitud: -89.23329936, telefono: '503-2511-7000', horario: 'Lun-Vie 8:00-16:00' },
+    { id: 1, nombre: 'MARN - Ministerio de Medio Ambiente', direccion: 'Km 5½ Carretera a Santa Tecla, Col. Las Mercedes, San Salvador', latitud: 13.68792636, longitud: -89.23142434, telefono: '503-2132-6000', horario: 'Lun-Vie 7:30-15:30' }
+  ];
 
   const searchUrl = `https://www.google.com/maps/search/centros+de+acopio/@${lat},${lng},13z`;
-
-  if (cargando) {
-    return <div className="cargando">⏳ Cargando centros de acopio...</div>;
-  }
-
-  if (error) {
-    return <div className="error">{error}</div>;
-  }
 
   return (
     <div className="mapa-container">
@@ -61,39 +38,34 @@ const MapaCentros = () => {
         </p>
       </div>
 
-      {centros.length === 0 ? (
-        <p className="sin-centros">No hay centros de acopio cercanos.</p>
-      ) : (
-        <ul className="lista-centros">
-          {centros.map((centro) => (
-            <li key={centro.id}>
-              <strong>{centro.nombre}</strong>
+      <ul className="lista-centros">
+        {centros.map((centro) => (
+          <li key={centro.id}>
+            <strong>{centro.nombre}</strong>
+            <br />
+            <small>
+              📍 {centro.direccion}
               <br />
-              <small>
-                📍 {centro.direccion}
-                <br />
-                📞 {centro.telefono || 'No disponible'}
-                <br />
-                🕐 {centro.horario || 'No disponible'}
-                <br />
-                <span className="coordenadas">
-                  📌 {centro.latitud.toFixed(6)}, {centro.longitud.toFixed(6)}
-                </span>
-                <br />
-                {/* ✅ Enlace con place para Google Maps */}
-                <a 
-                  href={`https://www.google.com/maps/place/${centro.latitud},${centro.longitud}/@${centro.latitud},${centro.longitud},17z`} 
-                  target="_blank" 
-                  rel="noopener noreferrer"
-                  className="btn-ver-mapa"
-                >
-                  Ver en mapa
-                </a>
-              </small>
-            </li>
-          ))}
-        </ul>
-      )}
+              📞 {centro.telefono || 'No disponible'}
+              <br />
+              🕐 {centro.horario || 'No disponible'}
+              <br />
+              <span className="coordenadas">
+                📌 {centro.latitud.toFixed(6)}, {centro.longitud.toFixed(6)}
+              </span>
+              <br />
+              <a 
+                href={`https://www.google.com/maps/place/${centro.latitud},${centro.longitud}/@${centro.latitud},${centro.longitud},17z`} 
+                target="_blank" 
+                rel="noopener noreferrer"
+                className="btn-ver-mapa"
+              >
+                Ver en mapa
+              </a>
+            </small>
+          </li>
+        ))}
+      </ul>
 
       <div className="mensaje-ambiental-mapa">
         <p>🌱 <strong>Recuerda:</strong> Cada dispositivo electrónico reciclado ayuda a reducir la contaminación por metales pesados y plásticos no biodegradables.</p>
@@ -102,4 +74,4 @@ const MapaCentros = () => {
   );
 };
 
-export default MapaCentros;
+export default MapaCentros; 
