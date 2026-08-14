@@ -36,8 +36,6 @@ public class SecurityConfig {
                 .csrf(csrf -> csrf.disable())
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
-                        // ===== ENDPOINTS PÚBLICOS (SIN AUTENTICACIÓN) =====
-                        // Swagger UI y documentación
                         .requestMatchers(
                                 "/swagger-ui/**",
                                 "/swagger-ui.html",
@@ -46,41 +44,24 @@ public class SecurityConfig {
                                 "/swagger-resources/**",
                                 "/webjars/**")
                         .permitAll()
-                        // Auth y Test
                         .requestMatchers("/api/auth/**").permitAll()
                         .requestMatchers("/api/test/**").permitAll()
 
-                        // ===== CENTROS DE ACOPIO =====
-                        // Consulta pública (RF-07/RF-11 lectura), pero crear
-                        // centros ya NO es público: antes /api/centros/**
-                        // permitAll cubría también el POST, así que cualquiera
-                        // sin sesión podía dar de alta centros falsos.
-                        // CORRECCIÓN FASE 4: Añadidos PUT y DELETE con rol ADMIN
-                        // para completar el CRUD de centros.
                         .requestMatchers(HttpMethod.GET, "/api/centros/**").permitAll()
                         .requestMatchers(HttpMethod.POST, "/api/centros").hasRole("ADMIN")
                         .requestMatchers(HttpMethod.PUT, "/api/centros/**").hasRole("ADMIN")
                         .requestMatchers(HttpMethod.DELETE, "/api/centros/**").hasRole("ADMIN")
 
-                        // ===== RESIDUOS =====
-                        // Antes solo exigían .authenticated() a nivel de
-                        // /api/residuos/**, así que cualquier CIUDADANO podía
-                        // ver /todos o cambiar el estado de cualquier residuo.
                         .requestMatchers(HttpMethod.GET, "/api/residuos/todos")
                         .hasAnyRole("OPERADOR_CENTRO", "OPERADOR_TECNICO", "ADMIN")
                         .requestMatchers(HttpMethod.PUT, "/api/residuos/*/estado")
                         .hasAnyRole("OPERADOR_CENTRO", "OPERADOR_TECNICO", "ADMIN")
                         .requestMatchers("/api/residuos/**").authenticated()
 
-                        // ===== TRAZABILIDAD =====
-                        // Consultar el historial: cualquier usuario autenticado
-                        // (el ciudadano dueño del residuo, operadores, admin).
-                        // Cambiar el estado: solo operadores/admin (RF-06/PT07).
                         .requestMatchers(HttpMethod.PUT, "/api/trazabilidad/*/estado")
                         .hasAnyRole("OPERADOR_CENTRO", "OPERADOR_TECNICO", "ADMIN")
                         .requestMatchers(HttpMethod.GET, "/api/trazabilidad/**").authenticated()
 
-                        // ===== ENDPOINTS SOLO ADMIN =====
                         .requestMatchers("/api/admin/**").hasRole("ADMIN")
                         .anyRequest().authenticated())
                 .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);

@@ -6,6 +6,7 @@ import java.util.stream.Collectors;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -120,6 +121,66 @@ public class ResiduoController {
                                 .build();
 
                 return ResponseEntity.ok(response);
+        }
+
+        /**
+         * FASE 4: Actualizar residuo (solo dueño, solo estado REGISTRADO).
+         */
+        @PutMapping("/{id}")
+        public ResponseEntity<?> actualizarResiduo(
+                        @RequestHeader("Authorization") String authHeader,
+                        @PathVariable Long id,
+                        @Valid @RequestBody ResiduoRequest request) {
+                try {
+                        String token = authHeader.substring(7);
+                        Long usuarioId = jwtUtil.extractUsuarioId(token);
+
+                        Residuo datosActualizados = Residuo.builder()
+                                        .tipo(request.getTipo())
+                                        .descripcion(request.getDescripcion())
+                                        .latitud(request.getLatitud())
+                                        .longitud(request.getLongitud())
+                                        .build();
+
+                        Residuo actualizado = residuoService.actualizarResiduo(id, usuarioId, datosActualizados);
+
+                        ResiduoResponse response = ResiduoResponse.builder()
+                                        .id(actualizado.getId())
+                                        .tipo(actualizado.getTipo())
+                                        .descripcion(actualizado.getDescripcion())
+                                        .estado(actualizado.getEstado())
+                                        .fechaRegistro(actualizado.getFechaRegistro())
+                                        .usuarioId(actualizado.getUsuario().getId())
+                                        .usuarioNombre(actualizado.getUsuario().getNombre())
+                                        .build();
+
+                        return ResponseEntity.ok(response);
+                } catch (IllegalStateException e) {
+                        return ResponseEntity.badRequest().body(Map.of("error", e.getMessage()));
+                } catch (Exception e) {
+                        return ResponseEntity.badRequest().body(Map.of("error", e.getMessage()));
+                }
+        }
+
+        /**
+         * FASE 4: Eliminar residuo (solo dueño, solo estado REGISTRADO).
+         */
+        @DeleteMapping("/{id}")
+        public ResponseEntity<?> eliminarResiduo(
+                        @RequestHeader("Authorization") String authHeader,
+                        @PathVariable Long id) {
+                try {
+                        String token = authHeader.substring(7);
+                        Long usuarioId = jwtUtil.extractUsuarioId(token);
+
+                        residuoService.eliminarResiduo(id, usuarioId);
+
+                        return ResponseEntity.ok(Map.of("mensaje", "Residuo eliminado exitosamente"));
+                } catch (IllegalStateException e) {
+                        return ResponseEntity.badRequest().body(Map.of("error", e.getMessage()));
+                } catch (Exception e) {
+                        return ResponseEntity.badRequest().body(Map.of("error", e.getMessage()));
+                }
         }
 
         @PutMapping("/{id}/estado")
