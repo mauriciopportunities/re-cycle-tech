@@ -19,4 +19,5 @@ public class ResiduoResponse {
     private LocalDateTime fechaRegistro;
     private String centroNombre;
     private Long usuarioId;
+    private String usuarioNombre;
 }

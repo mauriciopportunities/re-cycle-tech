@@ -4,11 +4,42 @@
   padding: 24px;
 }
 
+.lista-residuos-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
 .lista-residuos-container h2 {
   color: #2c3e50;
-  border-bottom: 3px solid #2ecc71;
-  padding-bottom: 12px;
-  margin-bottom: 20px;
+  margin: 0;
+  font-size: 28px;
+}
+
+.lista-residuos-stats {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.stat-badge {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background: #f0f8f4;
+  padding: 6px 14px;
+  border-radius: 20px;
+  font-size: 13px;
+  font-weight: 600;
+  color: #1a7a42;
+  border: 1px solid #d5e8db;
+}
+
+.stat-badge .icon {
+  font-size: 16px;
 }
 
 .tabla-residuos {
@@ -17,24 +48,80 @@
   background: white;
   border-radius: 12px;
   overflow: hidden;
-  box-shadow: 0 2px 10px rgba(0,0,0,0.08);
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.08);
+}
+
+.tabla-residuos thead {
+  background: #0f2b3d;
 }
 
 .tabla-residuos th {
-  background: #f1f5f9;
-  padding: 12px 16px;
+  padding: 14px 16px;
   text-align: left;
   font-weight: 600;
-  color: #2c3e50;
+  color: white;
+  font-size: 13px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
 }
 
 .tabla-residuos td {
-  padding: 10px 16px;
+  padding: 12px 16px;
   border-bottom: 1px solid #eef3f7;
+  font-size: 14px;
+  color: #2c3e50;
 }
 
-.tabla-residuos tr:hover {
+.tabla-residuos tbody tr {
+  transition: background 0.2s ease;
+}
+
+.tabla-residuos tbody tr:hover {
   background: #f8fafc;
+}
+
+.tabla-residuos tbody tr:last-child td {
+  border-bottom: none;
+}
+
+.residuo-id {
+  font-weight: 700;
+  color: #2980b9;
+}
+
+.residuo-tipo {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-weight: 600;
+}
+
+.tipo-icon {
+  font-size: 18px;
+}
+
+.residuo-usuario {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.usuario-avatar {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: #d5e8db;
+  color: #1a7a42;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  font-size: 12px;
+  text-transform: uppercase;
+}
+
+.usuario-nombre {
+  font-weight: 500;
 }
 
 .estado-badge {
@@ -42,7 +129,9 @@
   padding: 4px 12px;
   border-radius: 20px;
   font-size: 12px;
-  font-weight: 600;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
 }
 
 .estado-registrado {
@@ -75,7 +164,15 @@
   color: #c62828;
 }
 
+.fecha-residuo {
+  color: #7f8c8d;
+  font-size: 13px;
+}
+
 .btn-ver-trazabilidad {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
   padding: 6px 14px;
   background: #2ecc71;
   color: white;
@@ -83,11 +180,13 @@
   text-decoration: none;
   font-size: 13px;
   font-weight: 600;
-  transition: background 0.3s;
+  transition: all 0.3s ease;
 }
 
 .btn-ver-trazabilidad:hover {
   background: #27ae60;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(46, 204, 113, 0.3);
 }
 
 .sin-registros {
@@ -95,4 +194,49 @@
   color: #7f8c8d;
   padding: 40px;
   font-size: 18px;
+}
+
+.cargando {
+  text-align: center;
+  padding: 40px;
+  font-size: 18px;
+  color: #3498db;
+}
+
+.error {
+  text-align: center;
+  padding: 40px;
+  font-size: 18px;
+  color: #e74c3c;
+  background: #fadbd8;
+  border-radius: 8px;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .lista-residuos-container {
+    padding: 12px;
+  }
+  
+  .lista-residuos-header {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+  
+  .tabla-residuos th,
+  .tabla-residuos td {
+    padding: 8px 10px;
+    font-size: 12px;
+  }
+  
+  .usuario-avatar {
+    width: 22px;
+    height: 22px;
+    font-size: 10px;
+  }
+  
+  .btn-ver-trazabilidad {
+    padding: 4px 10px;
+    font-size: 11px;
+  }
 } 

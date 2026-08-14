@@ -161,6 +161,154 @@
   margin-top: 30px;
 }
 
+/* ============ CRUD CENTROS (FASE 4) ============ */
+
+.btn-crear-centro {
+  padding: 10px 20px;
+  background: #27ae60;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-weight: 600;
+  cursor: pointer;
+  margin-bottom: 12px;
+  transition: all 0.3s ease;
+}
+
+.btn-crear-centro:hover {
+  background: #219a52;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(39, 174, 96, 0.3);
+}
+
+.formulario-centro {
+  background: #f8f9fa;
+  border: 2px solid #d5e8db;
+  border-radius: 12px;
+  padding: 20px;
+  margin-bottom: 16px;
+}
+
+.formulario-centro h4 {
+  margin: 0 0 12px 0;
+  color: #1a5276;
+}
+
+.form-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 10px;
+}
+
+.form-grid input {
+  width: 100%;
+  padding: 8px 12px;
+  border: 2px solid #dce1e6;
+  border-radius: 8px;
+  font-size: 13px;
+  box-sizing: border-box;
+}
+
+.form-grid input:focus {
+  border-color: #27ae60;
+  outline: none;
+}
+
+.form-acciones {
+  display: flex;
+  gap: 10px;
+  margin-top: 12px;
+}
+
+.btn-guardar-centro {
+  padding: 8px 20px;
+  background: #27ae60;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.btn-guardar-centro:hover {
+  background: #219a52;
+}
+
+.btn-cancelar {
+  padding: 8px 20px;
+  background: #7f8c8d;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.btn-cancelar:hover {
+  background: #5d6d7e;
+}
+
+/* ============ BOTONES DE ACCIÓN PROFESIONALES ============ */
+
+.acciones-centro {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+.btn-accion {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 14px;
+  border: none;
+  border-radius: 6px;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  white-space: nowrap;
+}
+
+.btn-accion:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.btn-accion:active {
+  transform: translateY(0);
+}
+
+.btn-editar {
+  background: #eaf2f8;
+  color: #2980b9;
+  border: 1px solid #b0d4e3;
+}
+
+.btn-editar:hover {
+  background: #d4e6f1;
+  border-color: #2980b9;
+}
+
+.btn-eliminar {
+  background: #fadbd8;
+  color: #e74c3c;
+  border: 1px solid #f5b7b1;
+}
+
+.btn-eliminar:hover {
+  background: #f5b7b1;
+  border-color: #e74c3c;
+}
+
+.btn-icon {
+  font-size: 14px;
+}
+
+.btn-texto {
+  font-size: 13px;
+}
+
 @media (max-width: 768px) {
   .admin-stats {
     grid-template-columns: 1fr;
@@ -173,5 +321,24 @@
   .admin-table th,
   .admin-table td {
     padding: 6px 8px;
+  }
+
+  .form-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .acciones-centro {
+    flex-direction: column;
+    gap: 4px;
+  }
+  
+  .btn-accion {
+    width: 100%;
+    justify-content: center;
+    padding: 4px 8px;
+  }
+  
+  .btn-texto {
+    display: none; /* Solo mostrar icono en móvil */
   }
 } 
