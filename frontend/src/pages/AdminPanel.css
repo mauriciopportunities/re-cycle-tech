@@ -1,5 +1,6 @@
 .admin-panel {
-  max-width: 1200px;
+  max-width: 1400px;
+  width: 95%;
   margin: 0 auto;
   padding: 24px;
   font-family: 'Segoe UI', Arial, sans-serif;
@@ -104,64 +105,83 @@
 }
 
 .role-select {
-  padding: 4px 8px;
+  padding: 6px 10px;
   border-radius: 6px;
   border: 1px solid #d0dbe4;
   font-size: 13px;
-  margin-right: 8px;
 }
 
-.btn-delete {
-  background: none;
+/* ============ ACCIONES DE USUARIOS ============ */
+
+.acciones-usuario {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+/* ============ BOTONES DE ACCIÓN PROFESIONALES ============ */
+
+.btn-accion {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 14px;
   border: none;
-  cursor: pointer;
-  font-size: 16px;
-  padding: 4px 8px;
   border-radius: 6px;
-  transition: background 0.3s;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  white-space: nowrap;
 }
 
-.btn-delete:hover {
+.btn-accion:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.btn-accion:active {
+  transform: translateY(0);
+}
+
+.btn-editar {
+  background: #eaf2f8;
+  color: #2980b9;
+  border: 1px solid #b0d4e3;
+}
+
+.btn-editar:hover {
+  background: #d4e6f1;
+  border-color: #2980b9;
+}
+
+.btn-eliminar {
   background: #fadbd8;
-}
-
-.admin-mensaje-exito {
-  padding: 12px 16px;
-  background: #d5f5e3;
-  color: #1a7a42;
-  border-radius: 8px;
-  margin-bottom: 16px;
-  border-left: 4px solid #27ae60;
-}
-
-.admin-mensaje-error {
-  padding: 12px 16px;
-  background: #fadbd8;
-  color: #922b21;
-  border-radius: 8px;
-  margin-bottom: 16px;
-  border-left: 4px solid #e74c3c;
-}
-
-.admin-loading {
-  padding: 40px;
-  text-align: center;
-  font-size: 18px;
-  color: #3498db;
-}
-
-.admin-error {
-  padding: 40px;
-  text-align: center;
-  font-size: 18px;
   color: #e74c3c;
+  border: 1px solid #f5b7b1;
 }
 
-.admin-centros-section {
-  margin-top: 30px;
+.btn-eliminar:hover {
+  background: #f5b7b1;
+  border-color: #e74c3c;
 }
 
-/* ============ CRUD CENTROS (FASE 4) ============ */
+.btn-icon {
+  font-size: 14px;
+}
+
+.btn-texto {
+  font-size: 13px;
+}
+
+/* ============ CRUD CENTROS ============ */
+
+.acciones-centro {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
 
 .btn-crear-centro {
   padding: 10px 20px;
@@ -248,65 +268,40 @@
   background: #5d6d7e;
 }
 
-/* ============ BOTONES DE ACCIÓN PROFESIONALES ============ */
-
-.acciones-centro {
-  display: flex;
-  gap: 8px;
-  align-items: center;
+.admin-mensaje-exito {
+  padding: 12px 16px;
+  background: #d5f5e3;
+  color: #1a7a42;
+  border-radius: 8px;
+  margin-bottom: 16px;
+  border-left: 4px solid #27ae60;
 }
 
-.btn-accion {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  padding: 6px 14px;
-  border: none;
-  border-radius: 6px;
-  font-size: 13px;
-  font-weight: 600;
-  cursor: pointer;
-  transition: all 0.3s ease;
-  white-space: nowrap;
-}
-
-.btn-accion:hover {
-  transform: translateY(-1px);
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-}
-
-.btn-accion:active {
-  transform: translateY(0);
-}
-
-.btn-editar {
-  background: #eaf2f8;
-  color: #2980b9;
-  border: 1px solid #b0d4e3;
-}
-
-.btn-editar:hover {
-  background: #d4e6f1;
-  border-color: #2980b9;
-}
-
-.btn-eliminar {
+.admin-mensaje-error {
+  padding: 12px 16px;
   background: #fadbd8;
+  color: #922b21;
+  border-radius: 8px;
+  margin-bottom: 16px;
+  border-left: 4px solid #e74c3c;
+}
+
+.admin-loading {
+  padding: 40px;
+  text-align: center;
+  font-size: 18px;
+  color: #3498db;
+}
+
+.admin-error {
+  padding: 40px;
+  text-align: center;
+  font-size: 18px;
   color: #e74c3c;
-  border: 1px solid #f5b7b1;
 }
 
-.btn-eliminar:hover {
-  background: #f5b7b1;
-  border-color: #e74c3c;
-}
-
-.btn-icon {
-  font-size: 14px;
-}
-
-.btn-texto {
-  font-size: 13px;
+.admin-centros-section {
+  margin-top: 30px;
 }
 
 @media (max-width: 768px) {
@@ -327,7 +322,8 @@
     grid-template-columns: 1fr;
   }
 
-  .acciones-centro {
+  .acciones-centro,
+  .acciones-usuario {
     flex-direction: column;
     gap: 4px;
   }
@@ -339,6 +335,6 @@
   }
   
   .btn-texto {
-    display: none; /* Solo mostrar icono en móvil */
+    display: none;
   }
-} 
+}

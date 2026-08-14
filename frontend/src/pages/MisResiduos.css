@@ -1,0 +1,303 @@
+.mis-residuos-container {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 24px;
+}
+
+.mis-residuos-container h2 {
+  color: #2c3e50;
+  margin-bottom: 20px;
+}
+
+.residuos-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 16px;
+}
+
+.residuo-card {
+  background: white;
+  border-radius: 12px;
+  padding: 16px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.08);
+  border: 1px solid #e8ecf0;
+  transition: all 0.3s ease;
+}
+
+.residuo-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.12);
+}
+
+.residuo-card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 10px;
+}
+
+.residuo-icon {
+  font-size: 28px;
+}
+
+.residuo-card-body h3 {
+  margin: 0 0 8px 0;
+  color: #2c3e50;
+}
+
+.residuo-descripcion {
+  color: #5d6d7e;
+  font-size: 14px;
+  margin: 0 0 8px 0;
+}
+
+.residuo-fecha {
+  color: #7f8c8d;
+  font-size: 13px;
+}
+
+.residuo-card-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 12px;
+  padding-top: 12px;
+  border-top: 1px solid #eef3f7;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.btn-trazabilidad {
+  color: #2980b9;
+  text-decoration: none;
+  font-weight: 600;
+  font-size: 13px;
+}
+
+.btn-trazabilidad:hover {
+  text-decoration: underline;
+}
+
+/* ============ BOTONES DE ACCIÓN PROFESIONALES ============ */
+
+.residuo-acciones {
+  display: flex;
+  gap: 8px;
+}
+
+.btn-accion-residuo {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 14px;
+  border: none;
+  border-radius: 6px;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  white-space: nowrap;
+}
+
+.btn-accion-residuo:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.btn-accion-residuo:active {
+  transform: translateY(0);
+}
+
+.btn-editar-residuo {
+  background: #eaf2f8;
+  color: #2980b9;
+  border: 1px solid #b0d4e3;
+}
+
+.btn-editar-residuo:hover {
+  background: #d4e6f1;
+  border-color: #2980b9;
+}
+
+.btn-eliminar-residuo {
+  background: #fadbd8;
+  color: #e74c3c;
+  border: 1px solid #f5b7b1;
+}
+
+.btn-eliminar-residuo:hover {
+  background: #f5b7b1;
+  border-color: #e74c3c;
+}
+
+.btn-icon {
+  font-size: 14px;
+}
+
+.btn-texto {
+  font-size: 13px;
+}
+
+/* ============ FORMULARIO DE EDICIÓN ============ */
+
+.editar-form {
+  margin-top: 10px;
+}
+
+.edit-select, .edit-input {
+  width: 100%;
+  padding: 8px 12px;
+  border: 2px solid #dce1e6;
+  border-radius: 8px;
+  font-size: 13px;
+  margin-bottom: 8px;
+  box-sizing: border-box;
+}
+
+.edit-select:focus, .edit-input:focus {
+  border-color: #27ae60;
+  outline: none;
+}
+
+.edit-acciones {
+  display: flex;
+  gap: 8px;
+}
+
+.btn-guardar {
+  padding: 6px 14px;
+  background: #27ae60;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: 600;
+}
+
+.btn-guardar:hover {
+  background: #219a52;
+}
+
+.btn-cancelar {
+  padding: 6px 14px;
+  background: #7f8c8d;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: 600;
+}
+
+.btn-cancelar:hover {
+  background: #5d6d7e;
+}
+
+/* ============ VARIOS ============ */
+
+.sin-residuos {
+  text-align: center;
+  padding: 40px;
+}
+
+.btn-registrar-nuevo {
+  display: inline-block;
+  margin-top: 12px;
+  padding: 12px 24px;
+  background: #27ae60;
+  color: white;
+  border-radius: 8px;
+  text-decoration: none;
+  font-weight: 600;
+}
+
+.btn-registrar-nuevo:hover {
+  background: #219a52;
+}
+
+.estado-badge {
+  display: inline-block;
+  padding: 4px 12px;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.estado-registrado {
+  background: #e3f2fd;
+  color: #0d47a1;
+}
+
+.estado-pendiente_entrega {
+  background: #fff3e0;
+  color: #e65100;
+}
+
+.estado-recibido_en_centro {
+  background: #e8f5e9;
+  color: #2e7d32;
+}
+
+.estado-clasificado {
+  background: #f3e5f5;
+  color: #6a1b9a;
+}
+
+.estado-donado, .estado-reciclado, .estado-reacondicionado {
+  background: #e8f5e9;
+  color: #1e7e34;
+}
+
+.estado-destruccion_segura {
+  background: #ffebee;
+  color: #c62828;
+}
+
+.mensaje-exito {
+  padding: 12px 16px;
+  background: #d5f5e3;
+  color: #1a7a42;
+  border-radius: 8px;
+  margin-bottom: 16px;
+  border-left: 4px solid #27ae60;
+}
+
+.mensaje-error {
+  padding: 12px 16px;
+  background: #fadbd8;
+  color: #922b21;
+  border-radius: 8px;
+  margin-bottom: 16px;
+  border-left: 4px solid #e74c3c;
+}
+
+.cargando {
+  text-align: center;
+  padding: 40px;
+  font-size: 18px;
+  color: #3498db;
+}
+
+.error {
+  text-align: center;
+  padding: 40px;
+  font-size: 18px;
+  color: #e74c3c;
+  background: #fadbd8;
+  border-radius: 8px;
+}
+
+/* Responsive */
+@media (max-width: 600px) {
+  .residuos-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .btn-accion-residuo {
+    padding: 4px 10px;
+    font-size: 12px;
+  }
+  
+  .btn-texto {
+    display: none; /* Solo mostrar icono en móvil */
+  }
+} 

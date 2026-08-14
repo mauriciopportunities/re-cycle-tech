@@ -115,7 +115,7 @@ const ListaResiduos = () => {
                 </td>
                 <td>
                   <Link to={`/trazabilidad/${residuo.id}`} className="btn-ver-trazabilidad">
-                    🔍 Ver
+                    🔍 Ver trazabilidad
                   </Link>
                 </td>
               </tr>

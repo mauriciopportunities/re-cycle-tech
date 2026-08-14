@@ -1,207 +1,257 @@
 /* ============================================================
-   ESTILOS DEL FORMULARIO DE REGISTRO DE RESIDUOS
+   FORMULARIO DE REGISTRO - DISEÑO MODERNO
    ============================================================ */
 
-.registro-container {
-  max-width: 600px;
+.registro-container-modern {
+  max-width: 650px;
+  width: 95%;
   margin: 0 auto;
-  padding: 24px;
+  padding: 32px;
   background: #ffffff;
   border-radius: 16px;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+  box-shadow: 0 4px 25px rgba(0, 0, 0, 0.08);
   border: 1px solid #e8ecf0;
 }
 
-.registro-container h2 {
-  color: #2c3e50;
-  text-align: center;
-  margin-bottom: 4px;
-  font-size: 28px;
+.registro-header {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin-bottom: 20px;
 }
 
-.subtitulo {
-  text-align: center;
+.registro-header-icon {
+  font-size: 40px;
+}
+
+.registro-header h2 {
+  color: #2c3e50;
+  margin: 0;
+  font-size: 26px;
+  font-weight: 800;
+}
+
+.registro-subtitulo {
   color: #7f8c8d;
-  margin-bottom: 24px;
+  margin: 4px 0 0 0;
   font-size: 14px;
 }
 
-.campo {
+/* ============ CAMPOS ============ */
+
+.campo-modern {
   margin-bottom: 18px;
 }
 
-.campo label {
-  display: block;
-  font-weight: 600;
+.campo-modern label {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-weight: 700;
   margin-bottom: 6px;
   color: #2c3e50;
   font-size: 14px;
 }
 
-.select-tipo,
-.select-estado,
-.textarea-descripcion {
+.label-icon {
+  font-size: 16px;
+}
+
+.requerido {
+  color: #e74c3c;
+}
+
+.select-modern,
+.textarea-modern,
+.input-coordenada-modern {
   width: 100%;
-  padding: 10px 14px;
+  padding: 12px 16px;
   border: 2px solid #dce1e6;
   border-radius: 10px;
   font-size: 14px;
-  font-family: Arial, sans-serif;
-  transition: border-color 0.3s, box-shadow 0.3s;
+  font-family: 'Segoe UI', Arial, sans-serif;
+  transition: all 0.3s ease;
   background: #fafbfc;
+  box-sizing: border-box;
 }
 
-.select-tipo:focus,
-.select-estado:focus,
-.textarea-descripcion:focus {
+.select-modern:focus,
+.textarea-modern:focus,
+.input-coordenada-modern:focus {
   border-color: #27ae60;
   outline: none;
   box-shadow: 0 0 0 3px rgba(39, 174, 96, 0.15);
   background: #ffffff;
 }
 
-.textarea-descripcion {
+.textarea-modern {
   resize: vertical;
   min-height: 80px;
 }
 
-.campo-ubicacion {
+/* ============ UBICACIÓN ============ */
+
+.campo-ubicacion-modern {
   margin-bottom: 18px;
-  padding: 16px;
+  padding: 18px;
   background: #f0f8f4;
   border-radius: 12px;
   border: 2px solid #d5e8db;
 }
 
-.campo-ubicacion label {
-  display: block;
-  font-weight: 600;
+.campo-ubicacion-modern label {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-weight: 700;
   margin-bottom: 10px;
   color: #1a5276;
   font-size: 14px;
 }
 
-.ubicacion-actions {
+/* ============ UBICACIÓN PARA PRODUCCIÓN ============ */
+
+.btn-ubicacion-produccion {
   display: flex;
-  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
   gap: 10px;
-  margin-bottom: 12px;
-}
-
-.btn-ubicacion {
-  background: #3498db;
+  width: 100%;
+  padding: 16px 24px;
+  background: linear-gradient(135deg, #2980b9, #2471a3);
   color: white;
   border: none;
-  padding: 8px 18px;
-  border-radius: 8px;
+  border-radius: 12px;
+  font-weight: 700;
+  font-size: 16px;
   cursor: pointer;
-  font-weight: 600;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 15px rgba(41, 128, 185, 0.3);
+}
+
+.btn-ubicacion-produccion:hover:not(:disabled) {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 25px rgba(41, 128, 185, 0.4);
+}
+
+.btn-ubicacion-produccion:disabled {
+  background: #95a5a6;
+  cursor: not-allowed;
+  box-shadow: none;
+}
+
+.btn-ubicacion-produccion .spinner {
+  width: 20px;
+  height: 20px;
+  border: 3px solid rgba(255, 255, 255, 0.3);
+  border-top-color: white;
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+.ubicacion-ayuda {
+  text-align: center;
+  color: #7f8c8d;
   font-size: 13px;
-  transition: background 0.3s;
-  flex: 1;
-  min-width: 120px;
+  margin-top: 8px;
 }
 
-.btn-ubicacion:hover {
-  background: #2980b9;
-}
-
-.btn-ubicacion-default {
-  background: #8e44ad;
-  color: white;
-  border: none;
-  padding: 8px 18px;
-  border-radius: 8px;
-  cursor: pointer;
-  font-weight: 600;
-  font-size: 13px;
-  transition: background 0.3s;
-  flex: 1;
-  min-width: 120px;
-}
-
-.btn-ubicacion-default:hover {
-  background: #7d3c98;
-}
-
-.coordenadas {
+.ubicacion-confirmada-banner {
   display: flex;
+  align-items: center;
   gap: 12px;
-  margin-top: 8px;
+  padding: 14px 18px;
+  background: #d5f5e3;
+  border-radius: 10px;
+  border: 2px solid #27ae60;
 }
 
-.input-coordenada {
-  flex: 1;
-  padding: 10px 14px;
-  border: 2px solid #dce1e6;
-  border-radius: 8px;
-  font-size: 14px;
-  transition: border-color 0.3s;
-  background: #ffffff;
+.check-icon {
+  font-size: 24px;
 }
 
-.input-coordenada:focus {
-  border-color: #27ae60;
-  outline: none;
+.ubicacion-confirmada-banner strong {
+  color: #1a7a42;
 }
 
-.ubicacion-confirmada {
-  display: block;
-  margin-top: 8px;
+.ubicacion-confirmada-banner p {
+  margin: 2px 0 0 0;
   font-size: 13px;
-  color: #27ae60;
-  font-weight: 600;
+  color: #2e7d32;
 }
 
-.acciones-formulario {
+.btn-reintentar {
+  margin-left: auto;
+  background: none;
+  border: none;
+  font-size: 20px;
+  cursor: pointer;
+  transition: transform 0.3s;
+}
+
+.btn-reintentar:hover {
+  transform: rotate(90deg);
+}
+
+/* ============ BOTONES ============ */
+
+.acciones-formulario-modern {
   display: flex;
   gap: 12px;
   margin-top: 20px;
 }
 
-.btn-registrar {
+.btn-registrar-modern {
   flex: 2;
-  padding: 12px;
-  background: #27ae60;
+  padding: 14px;
+  background: linear-gradient(135deg, #27ae60, #219a52);
   color: white;
   border: none;
   border-radius: 10px;
-  font-size: 16px;
+  font-size: 15px;
   font-weight: 700;
   cursor: pointer;
-  transition: background 0.3s, transform 0.2s;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 15px rgba(39, 174, 96, 0.3);
 }
 
-.btn-registrar:hover:not(:disabled) {
-  background: #219a52;
-  transform: translateY(-1px);
+.btn-registrar-modern:hover:not(:disabled) {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 25px rgba(39, 174, 96, 0.4);
 }
 
-.btn-registrar:disabled {
+.btn-registrar-modern:disabled {
   background: #95a5a6;
   cursor: not-allowed;
-  transform: none;
+  box-shadow: none;
 }
 
-.btn-limpiar {
+.btn-limpiar-modern {
   flex: 1;
-  padding: 12px;
+  padding: 14px;
   background: #e74c3c;
   color: white;
   border: none;
   border-radius: 10px;
-  font-size: 16px;
+  font-size: 15px;
   font-weight: 700;
   cursor: pointer;
-  transition: background 0.3s;
+  transition: all 0.3s ease;
 }
 
-.btn-limpiar:hover {
+.btn-limpiar-modern:hover {
   background: #c0392b;
+  transform: translateY(-2px);
 }
 
-.mensaje-exito {
-  padding: 12px 16px;
+/* ============ MENSAJES ============ */
+
+.mensaje-exito-modern {
+  padding: 14px 18px;
   background: #d5f5e3;
   color: #1a7a42;
   border-radius: 10px;
@@ -211,8 +261,8 @@
   line-height: 1.6;
 }
 
-.mensaje-error {
-  padding: 12px 16px;
+.mensaje-error-modern {
+  padding: 14px 18px;
   background: #fadbd8;
   color: #922b21;
   border-radius: 10px;
@@ -223,57 +273,63 @@
 
 .link-login {
   color: #2980b9;
-  font-weight: 600;
+  font-weight: 700;
   text-decoration: underline;
   cursor: pointer;
 }
 
-.mensaje-ambiental {
+/* ============ MENSAJE AMBIENTAL ============ */
+
+.mensaje-ambiental-modern {
   margin-top: 24px;
   padding: 16px 20px;
   background: linear-gradient(135deg, #eafaf1 0%, #d5f5e3 100%);
   border-radius: 12px;
   border-left: 4px solid #27ae60;
-  font-size: 14px;
+  font-size: 13px;
   color: #1a5276;
   line-height: 1.6;
 }
 
-.mensaje-ambiental p {
+.mensaje-ambiental-modern p {
   margin: 6px 0;
 }
 
-.datos-impacto {
+.datos-impacto-modern {
   font-size: 13px;
   color: #2c3e50;
   background: rgba(255, 255, 255, 0.6);
   padding: 8px 12px;
   border-radius: 8px;
-  margin-top: 8px !important;
 }
 
-/* Responsive */
+/* ============ RESPONSIVE ============ */
+
 @media (max-width: 600px) {
-  .registro-container {
-    padding: 16px;
+  .registro-container-modern {
+    padding: 20px;
     margin: 0 10px;
   }
   
-  .coordenadas {
+  .coordenadas-modern {
     flex-direction: column;
     gap: 8px;
   }
   
-  .acciones-formulario {
+  .acciones-formulario-modern {
     flex-direction: column;
   }
   
-  .btn-registrar,
-  .btn-limpiar {
+  .btn-registrar-modern,
+  .btn-limpiar-modern {
     width: 100%;
   }
   
-  .ubicacion-actions {
+  .ubicacion-botones {
     flex-direction: column;
+  }
+  
+  .ubicacion-confirmada-banner {
+    flex-wrap: wrap;
   }
 } 

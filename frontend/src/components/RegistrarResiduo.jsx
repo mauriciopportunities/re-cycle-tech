@@ -14,9 +14,9 @@ const RegistrarResiduo = () => {
   const [error, setError] = useState('');
   const [cargando, setCargando] = useState(false);
   const [ubicacion, setUbicacion] = useState(null);
+  const [obteniendoUbicacion, setObteniendoUbicacion] = useState(false);
   const [token, setToken] = useState(null);
 
-  // Verificar autenticación al cargar el componente
   useEffect(() => {
     const storedToken = localStorage.getItem('token');
     if (storedToken) {
@@ -29,7 +29,6 @@ const RegistrarResiduo = () => {
     }
   }, []);
 
-  // Tipos de residuos (catálogo)
   const tiposResiduo = [
     { valor: 'BATERIA', label: '🔋 Baterías y celdas' },
     { valor: 'SMARTPHONE', label: '📱 Smartphones y tablets' },
@@ -48,31 +47,49 @@ const RegistrarResiduo = () => {
     { valor: 'PARA_PIEZAS', label: '🔩 Para piezas' }
   ];
 
-  // Obtener ubicación del usuario
   const obtenerUbicacion = () => {
-    if (navigator.geolocation) {
-      navigator.geolocation.getCurrentPosition(
-        (position) => {
-          const coords = {
-            lat: position.coords.latitude,
-            lng: position.coords.longitude
-          };
-          setUbicacion(coords);
-          setFormData({
-            ...formData,
-            latitud: position.coords.latitude,
-            longitud: position.coords.longitude
-          });
-          setMensaje('📍 Ubicación obtenida correctamente');
-          setError('');
-        },
-        () => {
-          setError('⚠️ No se pudo obtener la ubicación. Ingresa las coordenadas manualmente.');
-        }
-      );
-    } else {
-      setError('⚠️ Tu navegador no soporta geolocalización.');
+    if (!navigator.geolocation) {
+      setError('⚠️ Tu navegador no soporta geolocalización. Por favor, ingresa tus coordenadas manualmente.');
+      return;
     }
+
+    setObteniendoUbicacion(true);
+    setError('');
+
+    navigator.geolocation.getCurrentPosition(
+      (position) => {
+        const coords = {
+          lat: position.coords.latitude,
+          lng: position.coords.longitude
+        };
+        setUbicacion(coords);
+        setFormData(prev => ({
+          ...prev,
+          latitud: position.coords.latitude,
+          longitud: position.coords.longitude
+        }));
+        setObteniendoUbicacion(false);
+        setMensaje('📍 Ubicación obtenida correctamente');
+        setTimeout(() => setMensaje(''), 3000);
+      },
+      (err) => {
+        setObteniendoUbicacion(false);
+        switch (err.code) {
+          case err.PERMISSION_DENIED:
+            setError('⚠️ Permiso denegado. Por favor, ingresa tus coordenadas manualmente o permite el acceso a tu ubicación.');
+            break;
+          case err.POSITION_UNAVAILABLE:
+            setError('⚠️ Ubicación no disponible. Ingresa tus coordenadas manualmente.');
+            break;
+          case err.TIMEOUT:
+            setError('⚠️ Tiempo agotado. Intenta de nuevo o ingresa tus coordenadas manualmente.');
+            break;
+          default:
+            setError('⚠️ No se pudo obtener la ubicación. Ingresa tus coordenadas manualmente.');
+        }
+      },
+      { timeout: 10000, maximumAge: 60000 }
+    );
   };
 
   const handleChange = (e) => {
@@ -88,7 +105,6 @@ const RegistrarResiduo = () => {
     setError('');
     setMensaje('');
 
-    // Validaciones
     if (!formData.tipo) {
       setError('❌ El tipo de residuo es obligatorio');
       setCargando(false);
@@ -96,7 +112,7 @@ const RegistrarResiduo = () => {
     }
 
     if (!formData.latitud || !formData.longitud) {
-      setError('❌ La ubicación es obligatoria. Usa "Obtener ubicación" o ingresa coordenadas.');
+      setError('❌ Necesitamos tu ubicación. Haz clic en "Obtener ubicación" para continuar.');
       setCargando(false);
       return;
     }
@@ -136,7 +152,6 @@ const RegistrarResiduo = () => {
       });
       setUbicacion(null);
       
-      // Mensaje de concientización según el tipo de residuo
       const mensajesConcientizacion = {
         'BATERIA': '⚠️ Las baterías contienen metales pesados tóxicos. Almacena en contenedores seguros.',
         'MONITOR': '⚠️ Los monitores contienen mercurio y plomo. Manejar con cuidado.',
@@ -175,15 +190,26 @@ const RegistrarResiduo = () => {
   };
 
   return (
-    <div className="registro-container">
-      <h2>📦 Registrar Nuevo Residuo</h2>
-      <p className="subtitulo">Completa el formulario para registrar tu residuo electrónico</p>
+    <div className="registro-container-modern">
+      <div className="registro-header">
+        <span className="registro-header-icon">📦</span>
+        <div>
+          <h2>Registrar Nuevo Residuo</h2>
+          <p className="registro-subtitulo">Completa el formulario para registrar tu residuo electrónico</p>
+        </div>
+      </div>
 
-      {mensaje && <div className="mensaje-exito">{mensaje.split('\n').map((line, i) => <div key={i}>{line}</div>)}</div>}
-      {error && <div className="mensaje-error">{error}</div>}
+      {mensaje && (
+        <div className="mensaje-exito-modern">
+          {mensaje.split('\n').map((line, i) => (
+            <div key={i}>{line}</div>
+          ))}
+        </div>
+      )}
+      {error && <div className="mensaje-error-modern">{error}</div>}
 
       {!token && (
-        <div className="mensaje-error">
+        <div className="mensaje-error-modern">
           ⚠️ Debes iniciar sesión para registrar un residuo.
           <br />
           <a href="/login" className="link-login">Ir a iniciar sesión</a>
@@ -191,16 +217,18 @@ const RegistrarResiduo = () => {
       )}
 
       {token && (
-        <form onSubmit={handleSubmit}>
-          <div className="campo">
-            <label htmlFor="tipo">Tipo de residuo *</label>
+        <form onSubmit={handleSubmit} className="registro-form-modern">
+          <div className="campo-modern">
+            <label htmlFor="tipo">
+              <span className="label-icon">📱</span> Tipo de residuo <span className="requerido">*</span>
+            </label>
             <select
               id="tipo"
               name="tipo"
               value={formData.tipo}
               onChange={handleChange}
               required
-              className="select-tipo"
+              className="select-modern"
             >
               <option value="">Selecciona un tipo de residuo</option>
               {tiposResiduo.map(tipo => (
@@ -209,8 +237,10 @@ const RegistrarResiduo = () => {
             </select>
           </div>
 
-          <div className="campo">
-            <label htmlFor="descripcion">Descripción</label>
+          <div className="campo-modern">
+            <label htmlFor="descripcion">
+              <span className="label-icon">📝</span> Descripción
+            </label>
             <textarea
               id="descripcion"
               name="descripcion"
@@ -218,18 +248,20 @@ const RegistrarResiduo = () => {
               onChange={handleChange}
               placeholder="Describe el estado del equipo, marca, modelo, etc."
               rows="3"
-              className="textarea-descripcion"
+              className="textarea-modern"
             />
           </div>
 
-          <div className="campo">
-            <label htmlFor="estadoEquipo">Estado del equipo</label>
+          <div className="campo-modern">
+            <label htmlFor="estadoEquipo">
+              <span className="label-icon">🔍</span> Estado del equipo
+            </label>
             <select
               id="estadoEquipo"
               name="estadoEquipo"
               value={formData.estadoEquipo}
               onChange={handleChange}
-              className="select-estado"
+              className="select-modern"
             >
               <option value="">Selecciona una opción</option>
               {estadosEquipo.map(estado => (
@@ -238,66 +270,69 @@ const RegistrarResiduo = () => {
             </select>
           </div>
 
-          <div className="campo-ubicacion">
-            <label>📍 Ubicación *</label>
-            <div className="ubicacion-actions">
-              <button type="button" onClick={obtenerUbicacion} className="btn-ubicacion">
-                📡 Obtener ubicación
-              </button>
-              <button type="button" onClick={() => {
-                setFormData({
-                  ...formData,
-                  latitud: '13.791660737396686',
-                  longitud: '-89.17922954299647'
-                });
-                setMensaje('📍 Ubicación de Urbanización Las Orquideas cargada');
-              }} className="btn-ubicacion-default">
-                🏠 Usar ubicación de ejemplo
-              </button>
-            </div>
-            <div className="coordenadas">
-              <input
-                type="number"
-                id="latitud"
-                name="latitud"
-                placeholder="Latitud"
-                value={formData.latitud}
-                onChange={handleChange}
-                step="0.00000001"
-                className="input-coordenada"
-              />
-              <input
-                type="number"
-                id="longitud"
-                name="longitud"
-                placeholder="Longitud"
-                value={formData.longitud}
-                onChange={handleChange}
-                step="0.00000001"
-                className="input-coordenada"
-              />
-            </div>
-            {ubicacion && (
-              <span className="ubicacion-confirmada">
-                ✅ Ubicación: {ubicacion.lat.toFixed(6)}, {ubicacion.lng.toFixed(6)}
-              </span>
+          <div className="campo-ubicacion-modern">
+            <label>
+              <span className="label-icon">📍</span> Ubicación <span className="requerido">*</span>
+            </label>
+            
+            {!ubicacion ? (
+              <>
+                <button 
+                  type="button" 
+                  onClick={obtenerUbicacion} 
+                  className="btn-ubicacion-produccion"
+                  disabled={obteniendoUbicacion}
+                >
+                  {obteniendoUbicacion ? (
+                    <><span className="spinner"></span> Obteniendo ubicación...</>
+                  ) : (
+                    <><span>📡</span> Obtener mi ubicación</>
+                  )}
+                </button>
+                <p className="ubicacion-ayuda">
+                  Necesitamos tu ubicación para mostrarte los centros de acopio más cercanos.
+                </p>
+              </>
+            ) : (
+              <div className="ubicacion-confirmada-banner">
+                <span className="check-icon">✅</span>
+                <div>
+                  <strong>Ubicación obtenida correctamente</strong>
+                  <p>{ubicacion.lat.toFixed(6)}, {ubicacion.lng.toFixed(6)}</p>
+                </div>
+                <button type="button" onClick={obtenerUbicacion} className="btn-reintentar">
+                  🔄
+                </button>
+              </div>
             )}
+
+            {/* Campos ocultos que se llenan automáticamente */}
+            <input
+              type="hidden"
+              name="latitud"
+              value={formData.latitud}
+            />
+            <input
+              type="hidden"
+              name="longitud"
+              value={formData.longitud}
+            />
           </div>
 
-          <div className="acciones-formulario">
-            <button type="submit" disabled={cargando} className="btn-registrar">
+          <div className="acciones-formulario-modern">
+            <button type="submit" disabled={cargando} className="btn-registrar-modern">
               {cargando ? '⏳ Registrando...' : '✅ Registrar Residuo'}
             </button>
-            <button type="button" onClick={limpiarFormulario} className="btn-limpiar">
-              🗑️ Limpiar formulario
+            <button type="button" onClick={limpiarFormulario} className="btn-limpiar-modern">
+              🗑️ Limpiar
             </button>
           </div>
         </form>
       )}
 
-      <div className="mensaje-ambiental">
+      <div className="mensaje-ambiental-modern">
         <p>🌱 <strong>Recuerda:</strong> Al reciclar tus dispositivos electrónicos, contribuyes a reducir la contaminación por metales pesados y plásticos no biodegradables.</p>
-        <p className="datos-impacto">📊 <strong>Dato:</strong> Por cada tonelada de residuos electrónicos reciclados, se evita la extracción de nuevos recursos y se reduce la huella de carbono en un 70%.</p>
+        <p className="datos-impacto-modern">📊 <strong>Dato:</strong> Por cada tonelada de residuos electrónicos reciclados, se evita la extracción de nuevos recursos y se reduce la huella de carbono en un 70%.</p>
       </div>
     </div>
   );

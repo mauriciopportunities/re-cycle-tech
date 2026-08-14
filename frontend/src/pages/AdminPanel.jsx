@@ -141,7 +141,6 @@ const AdminPanel = () => {
   const guardarCentro = async (e) => {
     e.preventDefault();
     
-    // Validaciones
     if (!centroForm.nombre || !centroForm.direccion) {
       setError('❌ Nombre y dirección son obligatorios');
       return;
@@ -151,7 +150,6 @@ const AdminPanel = () => {
       return;
     }
     
-    // Validaciones de coordenadas (FASE 4)
     const lat = parseFloat(centroForm.latitud);
     const lng = parseFloat(centroForm.longitud);
     
@@ -176,7 +174,6 @@ const AdminPanel = () => {
 
     try {
       if (editandoCentro) {
-        // Actualizar centro existente
         await axios.put(
           `http://localhost:8000/api/centros/${editandoCentro}`,
           datosCentro,
@@ -184,7 +181,6 @@ const AdminPanel = () => {
         );
         setMensaje('✅ Centro actualizado correctamente');
       } else {
-        // Crear centro nuevo
         await axios.post(
           'http://localhost:8000/api/centros',
           datosCentro,
@@ -193,7 +189,6 @@ const AdminPanel = () => {
         setMensaje('✅ Centro creado correctamente');
       }
 
-      // Recargar centros
       const response = await axios.get('http://localhost:8000/api/centros');
       setCentros(response.data);
       
@@ -275,22 +270,26 @@ const AdminPanel = () => {
                   </span>
                 </td>
                 <td>
-                  <select 
-                    onChange={(e) => cambiarRol(user.id, e.target.value)}
-                    defaultValue={user.rol}
-                    className="role-select"
-                  >
-                    <option value="CIUDADANO">Ciudadano</option>
-                    <option value="OPERADOR_CENTRO">Operador Centro</option>
-                    <option value="OPERADOR_TECNICO">Operador Técnico</option>
-                    <option value="ADMIN">Administrador</option>
-                  </select>
-                  <button 
-                    onClick={() => eliminarUsuario(user.id)}
-                    className="btn-delete"
-                  >
-                    🗑️
-                  </button>
+                  <div className="acciones-usuario">
+                    <select 
+                      onChange={(e) => cambiarRol(user.id, e.target.value)}
+                      defaultValue={user.rol}
+                      className="role-select"
+                    >
+                      <option value="CIUDADANO">Ciudadano</option>
+                      <option value="OPERADOR_CENTRO">Operador Centro</option>
+                      <option value="OPERADOR_TECNICO">Operador Técnico</option>
+                      <option value="ADMIN">Administrador</option>
+                    </select>
+                    <button 
+                      onClick={() => eliminarUsuario(user.id)}
+                      className="btn-accion btn-eliminar"
+                      title="Eliminar usuario"
+                    >
+                      <span className="btn-icon">🗑️</span>
+                      <span className="btn-texto">Eliminar</span>
+                    </button>
+                  </div>
                 </td>
               </tr>
             ))}

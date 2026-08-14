@@ -1,75 +1,204 @@
-import { useState } from 'react';
+import axios from 'axios';
+import { useEffect, useState } from 'react';
 import './MapaCentros.css';
 
 const MapaCentros = () => {
-  const [cargando, setCargando] = useState(false);
+  const [centros, setCentros] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const [ubicacion, setUbicacion] = useState({
+    lat: 13.791661,
+    lng: -89.179230
+  });
+  const [obteniendoUbicacion, setObteniendoUbicacion] = useState(false);
+  const [radioKm, setRadioKm] = useState(5);
+  const [usandoUbicacionReal, setUsandoUbicacionReal] = useState(false);
 
-  const lat = 13.791660737396686;
-  const lng = -89.17922954299647;
+  const fetchCentros = async (lat, lng, radio) => {
+    try {
+      setLoading(true);
+      const response = await axios.get(
+        `http://localhost:8000/api/centros/cercanos`,
+        {
+          params: {
+            lat: lat,
+            lng: lng,
+            radioKm: radio
+          }
+        }
+      );
+      setCentros(response.data);
+      setError(null);
+    } catch (err) {
+      setError('Error al cargar los centros cercanos');
+      setCentros([]);
+    } finally {
+      setLoading(false);
+    }
+  };
 
-  // ✅ Datos locales (sin depender del backend)
-  const centros = [
-    { id: 3, nombre: 'ZARTEX - Gestor Autorizado', direccion: 'Calle Agua Caliente Km 5, Soyapango', latitud: 13.70533385, longitud: -89.15557049, telefono: '503-1234-5678', horario: 'Lun-Vie 8:00-17:00' },
-    { id: 4, nombre: 'AUTOCONSA - Gestor Autorizado', direccion: '37 Ave. Sur #543, Col. Flor Blanca, San Salvador', latitud: 13.69701430, longitud: -89.21070491, telefono: '503-1234-5679', horario: 'Lun-Vie 8:00-17:00' },
-    { id: 2, nombre: 'SRS - Superintendencia de Regulación Sanitaria', direccion: '75 Av. Sur #214, Col. Escalón, San Salvador', latitud: 13.70113358, longitud: -89.23329936, telefono: '503-2511-7000', horario: 'Lun-Vie 8:00-16:00' },
-    { id: 1, nombre: 'MARN - Ministerio de Medio Ambiente', direccion: 'Km 5½ Carretera a Santa Tecla, Col. Las Mercedes, San Salvador', latitud: 13.68792636, longitud: -89.23142434, telefono: '503-2132-6000', horario: 'Lun-Vie 7:30-15:30' }
-  ];
+  const obtenerUbicacionUsuario = () => {
+    if (navigator.geolocation) {
+      setObteniendoUbicacion(true);
+      navigator.geolocation.getCurrentPosition(
+        (position) => {
+          const { latitude, longitude } = position.coords;
+          setUbicacion({ lat: latitude, lng: longitude });
+          setUsandoUbicacionReal(true);
+          fetchCentros(latitude, longitude, radioKm);
+          setObteniendoUbicacion(false);
+        },
+        () => {
+          setError('⚠️ No se pudo obtener tu ubicación. Usando ubicación por defecto.');
+          setObteniendoUbicacion(false);
+        }
+      );
+    } else {
+      setError('⚠️ Tu navegador no soporta geolocalización.');
+    }
+  };
 
-  const searchUrl = `https://www.google.com/maps/search/centros+de+acopio/@${lat},${lng},13z`;
+  const cambiarRadio = (nuevoRadio) => {
+    setRadioKm(nuevoRadio);
+    fetchCentros(ubicacion.lat, ubicacion.lng, nuevoRadio);
+  };
+
+  useEffect(() => {
+    fetchCentros(ubicacion.lat, ubicacion.lng, radioKm);
+  }, []);
+
+  const formatDistancia = (distancia) => {
+    if (distancia < 1) {
+      return `${(distancia * 1000).toFixed(0)} m`;
+    }
+    return `${distancia.toFixed(1)} km`;
+  };
 
   return (
-    <div className="mapa-container">
-      <h2>📍 Centros de Acopio Cercanos</h2>
-      <p className="info-ubicacion">
-        📌 Tu ubicación: {lat.toFixed(6)}, {lng.toFixed(6)}
-      </p>
-
-      <div className="mapa-enlace-container">
-        <a 
-          href={searchUrl} 
-          target="_blank" 
-          rel="noopener noreferrer"
-          className="btn-maps-enlace"
-        >
-          🗺️ Buscar centros de acopio cerca de ti
-        </a>
-        <p className="info-enlace">
-          Haz clic para ver todos los centros de acopio en Google Maps.
-        </p>
+    <div className="mapa-section-modern">
+      {/* Encabezado */}
+      <div className="mapa-header-modern">
+        <div className="mapa-titulo">
+          <span className="mapa-titulo-icon">📍</span>
+          <div>
+            <h3>Centros de Acopio Cercanos</h3>
+            <p className="mapa-subtitulo">Encuentra el centro más cercano a tu ubicación</p>
+          </div>
+        </div>
+        
+        <div className="mapa-controles-modern">
+          <button 
+            onClick={obtenerUbicacionUsuario}
+            className={`btn-ubicacion-modern ${usandoUbicacionReal ? 'activo' : ''}`}
+            disabled={obteniendoUbicacion}
+          >
+            {obteniendoUbicacion ? (
+              <><span className="spinner"></span> Obteniendo...</>
+            ) : (
+              <><span className="btn-icon-ubicacion">📡</span> Usar mi ubicación</>
+            )}
+          </button>
+          
+          <div className="radio-selector">
+            <label className="radio-label">Radio de búsqueda:</label>
+            <div className="radio-botones">
+              {[1, 3, 5, 10, 20].map(radio => (
+                <button
+                  key={radio}
+                  onClick={() => cambiarRadio(radio)}
+                  className={`radio-btn ${radioKm === radio ? 'radio-btn-activo' : ''}`}
+                >
+                  {radio} km
+                </button>
+              ))}
+            </div>
+          </div>
+        </div>
       </div>
 
-      <ul className="lista-centros">
-        {centros.map((centro) => (
-          <li key={centro.id}>
-            <strong>{centro.nombre}</strong>
-            <br />
-            <small>
-              📍 {centro.direccion}
-              <br />
-              📞 {centro.telefono || 'No disponible'}
-              <br />
-              🕐 {centro.horario || 'No disponible'}
-              <br />
-              <span className="coordenadas">
-                📌 {centro.latitud.toFixed(6)}, {centro.longitud.toFixed(6)}
-              </span>
-              <br />
-              <a 
-                href={`https://www.google.com/maps/place/${centro.latitud},${centro.longitud}/@${centro.latitud},${centro.longitud},17z`} 
-                target="_blank" 
-                rel="noopener noreferrer"
-                className="btn-ver-mapa"
-              >
-                Ver en mapa
-              </a>
-            </small>
-          </li>
-        ))}
-      </ul>
-
-      <div className="mensaje-ambiental-mapa">
-        <p>🌱 <strong>Recuerda:</strong> Cada dispositivo electrónico reciclado ayuda a reducir la contaminación por metales pesados y plásticos no biodegradables.</p>
+      {/* Info de ubicación */}
+      <div className="ubicacion-banner-modern">
+        <span className="ubicacion-icon">📍</span>
+        <span className="ubicacion-texto">
+          Tu ubicación actual: <strong>{ubicacion.lat.toFixed(6)}, {ubicacion.lng.toFixed(6)}</strong>
+        </span>
+        <span className="ubicacion-badge">
+          Radio: {radioKm} km
+        </span>
+        {usandoUbicacionReal && (
+          <span className="ubicacion-real-badge">✓ Ubicación real</span>
+        )}
       </div>
+
+      {/* Error */}
+      {error && (
+        <div className="mapa-error-modern">
+          <span className="error-icon">⚠️</span>
+          {error}
+        </div>
+      )}
+
+      {/* Contenido */}
+      {loading && centros.length === 0 ? (
+        <div className="mapa-loading-modern">
+          <div className="spinner-grande"></div>
+          <p>Buscando centros cercanos...</p>
+        </div>
+      ) : centros.length === 0 ? (
+        <div className="sin-centros-modern">
+          <span className="sin-centros-icon">🔍</span>
+          <h4>No se encontraron centros</h4>
+          <p>No hay centros de acopio en el radio de {radioKm} km.</p>
+          <button onClick={() => cambiarRadio(20)} className="btn-ampliar">
+            Ampliar a 20 km
+          </button>
+        </div>
+      ) : (
+        <>
+          <div className="centros-count">
+            <span className="count-badge">
+              {centros.length} {centros.length === 1 ? 'centro encontrado' : 'centros encontrados'}
+            </span>
+          </div>
+          
+          <div className="mapa-centros-grid-modern">
+            {centros.map(centro => (
+              <div key={centro.id} className="centro-card-modern">
+                <div className="centro-card-top">
+                  <span className="centro-icon-modern">♻️</span>
+                  <span className="centro-distancia-badge">
+                    📍 {formatDistancia(centro.distanciaKm)}
+                  </span>
+                </div>
+                
+                <h4 className="centro-nombre-modern">{centro.nombre}</h4>
+                
+                <div className="centro-detalles">
+                  <p><span className="detalle-icon">📍</span> {centro.direccion}</p>
+                  {centro.telefono && (
+                    <p><span className="detalle-icon">📞</span> {centro.telefono}</p>
+                  )}
+                  {centro.horario && (
+                    <p><span className="detalle-icon">🕐</span> {centro.horario}</p>
+                  )}
+                  {centro.capacidad && (
+                    <p><span className="detalle-icon">📦</span> {centro.capacidad}</p>
+                  )}
+                </div>
+                
+                <a
+                  href={`https://www.google.com/maps?q=${centro.latitud},${centro.longitud}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="btn-como-llegar-modern"
+                >
+                  🧭 Cómo llegar
+                </a>
+              </div>
+            ))}
+          </div>
+        </>
+      )}
     </div>
   );
 };
